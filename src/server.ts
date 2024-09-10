@@ -1,1 +1,1 @@
-console.log(sdf)
+console.log('Hello duniya!')
