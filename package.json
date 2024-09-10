@@ -10,7 +10,11 @@
     "prettier": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
     "prettier:fix": "prettier --write .",
     "lint-prettier": "bun lint && bun prettier",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -22,6 +26,7 @@
     "@typescript-eslint/eslint-plugin": "^8.5.0",
     "@typescript-eslint/parser": "^8.5.0",
     "bun-types": "^1.1.27",
+    "drizzle-kit": "^0.24.2",
     "eslint": "8",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
@@ -36,12 +41,15 @@
     "typescript": "5.6.0"
   },
   "dependencies": {
+    "@vercel/postgres": "^0.10.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.33.0",
     "express": "^4.20.0",
     "jsonwebtoken": "^9.0.2",
+    "postgres": "^3.4.4",
     "winston": "^3.14.2",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^3.23.8"
