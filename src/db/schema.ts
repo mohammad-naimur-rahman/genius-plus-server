@@ -1,14 +1,7 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from 'drizzle-orm'
-import {
-  index,
-  pgTableCreator,
-  serial,
-  timestamp,
-  varchar
-} from 'drizzle-orm/pg-core'
+import { pgTableCreator } from 'drizzle-orm/pg-core'
 import envVars from '~configs'
 
 /**
@@ -19,22 +12,4 @@ import envVars from '~configs'
  */
 export const createTable = pgTableCreator(
   name => `${envVars.db.dbPrefix}_${name}`
-)
-
-export const posts = createTable(
-  'post',
-  {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 256 }),
-    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp('updated_at', {
-      withTimezone: true,
-      mode: 'string'
-    }).$onUpdate(() => sql`CURRENT_TIMESTAMP`)
-  },
-  example => ({
-    nameIndex: index('name_idx').on(example.name)
-  })
 )

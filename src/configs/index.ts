@@ -1,4 +1,8 @@
+import dotenv from 'dotenv'
+import path from 'path'
 import z from 'zod'
+
+dotenv.config({ path: path.join(process.cwd(), '.env') })
 
 const envSchema = z.object({
   NODE_ENV: z

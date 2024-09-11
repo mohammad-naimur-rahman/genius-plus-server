@@ -1,9 +1,8 @@
 import { type Config, defineConfig } from 'drizzle-kit'
-
 import envVars from '~configs'
 
 export default defineConfig({
-  schema: './src/db/schema.ts',
+  schema: './src/db/schemas',
   dialect: 'postgresql',
   dbCredentials: {
     url: envVars.db.postgresUrl
