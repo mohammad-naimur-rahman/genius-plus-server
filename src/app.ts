@@ -18,7 +18,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.get('/hello', async (req, res) => {
-  const newPost = await db.insert(posts).values({ name: 'Second Blogs' })
+  const newPost = await db.insert(posts).values({ name: 'Test Blog' })
   console.log(newPost)
   const allPosts = await db.query.posts.findMany()
   console.log(allPosts)

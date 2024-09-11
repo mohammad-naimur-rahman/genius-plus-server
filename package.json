@@ -7,7 +7,7 @@
     "start": "bun src/server.ts",
     "lint": "eslint --ignore-path .eslintignore --ext .js,.ts .",
     "lint:fix": "eslint . --fix",
-    "prettier": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
+    "prettier": "prettier --ignore-path .gitignore --write 'src/**/*.{js,ts,json}'",
     "prettier:fix": "prettier --write .",
     "lint-prettier": "bun lint && bun prettier",
     "prepare": "husky",
@@ -54,6 +54,6 @@
     "zod": "^3.23.8"
   },
   "lint-staged": {
-    "src/**/*.ts": "bun lint-prettier"
+    "*.{js,ts}": "bun lint-prettier"
   }
 }

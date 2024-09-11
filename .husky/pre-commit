@@ -1,1 +1,1 @@
-bun lint-prettier
+npx lint-staged
