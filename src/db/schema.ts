@@ -26,12 +26,13 @@ export const posts = createTable(
   {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 256 }),
-    createdAt: timestamp('created_at', { withTimezone: true })
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).$onUpdate(
-      () => new Date()
-    )
+    updatedAt: timestamp('updated_at', {
+      withTimezone: true,
+      mode: 'string'
+    }).$onUpdate(() => sql`CURRENT_TIMESTAMP`)
   },
   example => ({
     nameIndex: index('name_idx').on(example.name)
