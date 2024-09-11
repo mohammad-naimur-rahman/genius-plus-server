@@ -6,6 +6,7 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -13,16 +14,34 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "drizzle", "prettier"],
   "rules": {
-    "no-unused-vars": "error",
+    "prettier/prettier": "warn",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
     "prefer-const": "error",
     "no-unused-expressions": "error",
     "no-undef": "error",
     "no-console": "off",
     "@typescript-eslint/consistent-type-definitions": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-explicit-any": "off"
+    "@typescript-eslint/no-explicit-any": "warn",
+    "drizzle/enforce-delete-with-where": [
+      "error",
+      {
+        "drizzleObjectName": ["db", "ctx.db"]
+      }
+    ],
+    "drizzle/enforce-update-with-where": [
+      "error",
+      {
+        "drizzleObjectName": ["db", "ctx.db"]
+      }
+    ]
   },
   "globals": {
     "process": "readonly"

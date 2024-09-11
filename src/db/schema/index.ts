@@ -1,0 +1,6 @@
+// export { default as category, categoryRelations } from '~db/schema/category'
+// export { default as comment, commentRelations } from '~db/schema/comment'
+// export { default as post, postRelations } from '~db/schema/post'
+// export { default as postTags, postTagsRelations } from '~db/schema/postTags'
+// export { default as tag, tagRelations } from '~db/schema/tag'
+// export { default as user, userRelations } from '~db/schema/user'
