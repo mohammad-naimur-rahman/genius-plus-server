@@ -10,7 +10,7 @@ const generateVerificationLink = (user: NewUser) => {
       .createHash('sha256')
       .update(envVars.auth.cryptoSecret!)
       .digest('base64')
-      .substr(0, 32) // Ensure 32-byte key
+      .substring(0, 32) // Ensure 32-byte key
     const iv = crypto.randomBytes(16) // IV should be 16 bytes for aes-256-cbc
     const expirationTime = ms(envVars.ses.verificationLinkExpiresIn) // e.g., '30m' from .env
     const expirationDate = Date.now() + expirationTime // Calculate expiration timestamp
