@@ -5,6 +5,7 @@ import z from 'zod'
 dotenv.config({ path: path.join(process.cwd(), '.env') })
 
 const envSchema = z.object({
+  NAME: z.string(),
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
@@ -12,6 +13,7 @@ const envSchema = z.object({
     .string()
     .default('5000')
     .refine(val => Number(val)),
+  CLIENT_URL: z.string().url(),
   POSTGRES_URL: z.string().url(),
   POSTGRES_PRISMA_URL: z.string().url(),
   POSTGRES_URL_NO_SSL: z.string().url(),
@@ -25,7 +27,13 @@ const envSchema = z.object({
   JWT_SECRET: z.string(),
   JWT_EXPIRES_IN: z.string(),
   JWT_REFRESH_SECRET: z.string(),
-  JWT_REFRESH_EXPIRES_IN: z.string()
+  JWT_REFRESH_EXPIRES_IN: z.string(),
+  CRYPTO_SECRET: z.string(),
+  EMAIL_VERIFY_REDIRECT_URL: z.string().url(),
+  SMTP_EMAIL: z.string().email(),
+  SMTP_PASSWORD: z.string(),
+  SMTP_HOST: z.string(),
+  VERIFICATION_LINK_EXPIRES_IN: z.string()
 })
 
 const envServer = envSchema.safeParse({ ...process.env })
@@ -36,8 +44,10 @@ if (!envServer.success) {
 }
 
 const envVars = {
+  name: envServer.data.NAME,
   port: envServer.data.PORT,
   env: envServer.data.NODE_ENV,
+  clientUrl: envServer.data.CLIENT_URL,
   db: {
     postgresUrl: envServer.data.POSTGRES_URL,
     postgresPrismaUrl: envServer.data.POSTGRES_PRISMA_URL,
@@ -55,7 +65,17 @@ const envVars = {
     jwtRefreshSecret: envServer.data.JWT_REFRESH_SECRET,
     jwtRefreshExpiresIn: envServer.data.JWT_REFRESH_EXPIRES_IN
   },
-  bcryptSaltRounds: envServer.data.BCRYPT_SALT_ROUNDS
+  auth: {
+    bcryptSaltRounds: envServer.data.BCRYPT_SALT_ROUNDS,
+    cryptoSecret: process.env.CRYPTO_SECRET
+  },
+  ses: {
+    emailVerifyRedirectUrl: envServer.data.EMAIL_VERIFY_REDIRECT_URL,
+    smtpEmail: envServer.data.SMTP_EMAIL,
+    smtpPassword: envServer.data.SMTP_PASSWORD,
+    smtpHost: envServer.data.SMTP_HOST,
+    verificationLinkExpiresIn: envServer.data.VERIFICATION_LINK_EXPIRES_IN
+  }
 }
 
 export default envVars

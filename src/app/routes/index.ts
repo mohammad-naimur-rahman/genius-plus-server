@@ -1,4 +1,6 @@
 import express, { Router } from 'express'
+import { authRoutes } from '~app/modules/auth/auth.routes'
+import { TaskRoutes } from '~app/modules/tasks/task.routes'
 import { userRoutes } from '~app/modules/users/user.routes'
 
 const router = express.Router()
@@ -9,10 +11,9 @@ interface ModuleRoute {
 }
 
 const moduleRoutes: ModuleRoute[] = [
-  {
-    path: '/users',
-    routes: userRoutes
-  }
+  { path: '/auth', routes: authRoutes },
+  { path: '/users', routes: userRoutes },
+  { path: '/tasks', routes: TaskRoutes }
 ]
 
 moduleRoutes.forEach(route => router.use(route.path, route.routes))

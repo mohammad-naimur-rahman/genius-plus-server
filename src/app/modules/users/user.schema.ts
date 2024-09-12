@@ -1,5 +1,4 @@
 import {
-  boolean,
   pgEnum,
   serial,
   smallint,
@@ -9,6 +8,7 @@ import {
 import { createTable } from '~db/utils'
 
 export const userRoleEnum = pgEnum('role', ['admin', 'user'])
+export const signupMethodEnum = pgEnum('signup_method', ['email', 'google'])
 
 const user = createTable('users', {
   id: serial('id').primaryKey(),
@@ -19,9 +19,12 @@ const user = createTable('users', {
   profile_image: varchar('profile_image', { length: 255 }),
   age: smallint('age'),
   role: userRoleEnum('role').default('user'),
-  is_verified: boolean('is_verified').default(false),
+  signup_method: signupMethodEnum('signup_method').default('email'),
   createdAt: timestamp('created_at', { mode: 'string' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow()
 })
+
+export type User = typeof user.$inferSelect
+export type NewUser = typeof user.$inferInsert
 
 export default user

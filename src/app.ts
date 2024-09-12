@@ -8,20 +8,22 @@ import httpStatus from '~utils/httpStatus'
 
 const app: Application = express()
 
+// Middlewares
 app.use(cors())
 app.use(cookieParser())
 app.use(requestLogger)
 
-//parser
+// Parser
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// Routes
 app.use('/api/v1', router)
 
-//global error handler
+//Global error handler
 app.use(globalErrorHandler)
 
-//handle not found
+//Handle not found
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(httpStatus.NOT_FOUND).json({
     success: false,

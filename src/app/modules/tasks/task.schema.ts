@@ -7,7 +7,7 @@ import {
   varchar
 } from 'drizzle-orm/pg-core'
 import { createTable } from '~db/utils'
-import todo from './todo'
+import todo from '../../../db/schema/todo'
 
 export const taskPriorityEnum = pgEnum('priority', [
   'Very Low',

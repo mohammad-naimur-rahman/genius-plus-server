@@ -1,5 +1,5 @@
 import { DrizzleError } from 'drizzle-orm'
-import { ErrorRequestHandler, Request, Response } from 'express'
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express'
 import { ZodError } from 'zod'
 import envVars from '~configs'
 import { IGenericErrorMessage } from '~types/error'
@@ -11,8 +11,9 @@ import { errorlogger } from '../../shared/logger'
 // Global error handler
 const globalErrorHandler: ErrorRequestHandler = (
   error,
-  req: Request,
-  res: Response
+  _req: Request,
+  res: Response,
+  _next: NextFunction
 ) => {
   if (envVars.env === 'development')
     console.log(`🐱‍🏍 globalErrorHandler ~~`, { error })

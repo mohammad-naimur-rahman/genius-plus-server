@@ -2,7 +2,7 @@ import { relations } from 'drizzle-orm'
 import { date, integer, serial } from 'drizzle-orm/pg-core'
 import user from '~app/modules/users/user.schema'
 import { createTable } from '~db/utils'
-import task from './task'
+import task from '../../app/modules/tasks/task.schema'
 
 const todo = createTable('todos', {
   id: serial('id').primaryKey(),

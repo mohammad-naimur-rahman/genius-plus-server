@@ -5,7 +5,7 @@ import { db } from '~db'
 async function main() {
   if (config.out) {
     await migrate(db as any, { migrationsFolder: config.out })
-    console.log('Migration done!')
+    console.info('Migration done!')
   }
 }
 
