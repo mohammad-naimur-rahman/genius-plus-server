@@ -2,7 +2,6 @@ import crypto from 'crypto'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import ms from 'ms'
 import envVars from '~configs'
-import { NewUser } from '../users/user.schema'
 
 const algorithm = 'aes-256-cbc'
 const key = crypto
@@ -11,16 +10,16 @@ const key = crypto
   .digest()
 const ivLength = 16
 
-const generateVerificationLink = (user: NewUser) => {
+const generateVerificationLink = <T>(data: T, redirectURL: string) => {
   const iv = crypto.randomBytes(ivLength)
   const expirationTime = ms(envVars.ses.verificationLinkExpiresIn)
   const expires_at = Date.now() + expirationTime
-  const payload = { ...user, expires_at }
+  const payload = { ...data, expires_at }
   const cipher = crypto.createCipheriv(algorithm, key, iv)
   let encrypted = cipher.update(JSON.stringify(payload), 'utf8', 'hex')
   encrypted += cipher.final('hex')
   const encryptedData = iv.toString('hex') + ':' + encrypted
-  const confirmationLink = `${envVars.ses.emailVerifyRedirectUrl}${encodeURIComponent(encryptedData)}`
+  const confirmationLink = `${redirectURL}${encodeURIComponent(encryptedData)}`
   return confirmationLink
 }
 

@@ -29,6 +29,7 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string(),
   CRYPTO_SECRET: z.string(),
   EMAIL_VERIFY_REDIRECT_URL: z.string().url(),
+  FORGET_PASSWORD_VERIFY_REDIRECT_URL: z.string().url(),
   SMTP_EMAIL: z.string().email(),
   SMTP_PASSWORD: z.string(),
   SMTP_HOST: z.string(),
@@ -69,6 +70,8 @@ const envVars = {
   },
   ses: {
     emailVerifyRedirectUrl: envServer.data.EMAIL_VERIFY_REDIRECT_URL,
+    forgetPasswordVerifyRedirectUrl:
+      envServer.data.FORGET_PASSWORD_VERIFY_REDIRECT_URL,
     smtpEmail: envServer.data.SMTP_EMAIL,
     smtpPassword: envServer.data.SMTP_PASSWORD,
     smtpHost: envServer.data.SMTP_HOST,
