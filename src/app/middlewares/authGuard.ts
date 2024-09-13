@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
-import envVars from '~configs'
+import { authUtils } from '~app/modules/auth/auth.utils'
 import ApiError from '~utils/errorHandlers/ApiError'
 import httpStatus from '~utils/httpStatus'
-import { jwtUtils } from '~utils/jwtUtils'
 
 const authGuard =
   (...requiredRoles: string[]) =>
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, _res: Response, next: NextFunction) => {
     try {
       // Get authorization token
       const token = req.headers.authorization
@@ -23,13 +22,13 @@ const authGuard =
 
       // Verify token
       let verifiedUser = null
-      verifiedUser = jwtUtils.verifyToken(accessToken, envVars.jwt.jwtSecret)
+      verifiedUser = authUtils.verifyToken(accessToken)
 
       req.user = verifiedUser
 
       // Check if user is in required roles
       if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
-        throw new ApiError(httpStatus.FORBIDDEN, `You can't do this action`)
+        throw new ApiError(httpStatus.FORBIDDEN, "You can't do this action")
       }
 
       next()

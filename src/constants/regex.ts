@@ -7,3 +7,4 @@
 
 export const signUpRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,32}$/
 export const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/
+export const jwtRegex = /^Bearer\s[A-Za-z0-9-_]+(?:\.[A-Za-z0-9-_]+){2}$/

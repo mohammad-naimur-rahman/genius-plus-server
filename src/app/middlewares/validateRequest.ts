@@ -10,7 +10,7 @@ const validateRequest =
         query: req.query,
         params: req.params,
         cookies: req.cookies,
-        Headers: req.headers
+        headers: req.headers
       })
       return next()
     } catch (error) {
