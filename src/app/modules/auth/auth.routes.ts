@@ -1,5 +1,7 @@
 import { Router } from 'express'
+import authGuard from '~app/middlewares/authGuard'
 import validateRequest from '~app/middlewares/validateRequest'
+import { ENUM_USER_ROLE } from '~enums/user'
 import { authController } from './auth.controller'
 import { authValidation } from './auth.validaton'
 
@@ -30,6 +32,13 @@ router.post(
   '/reset-forget-password',
   validateRequest(authValidation.resetForgetPasswordZSchema),
   authController.resetForgetPassword
+)
+
+router.post(
+  '/reset-password',
+  validateRequest(authValidation.resetPasswordZSchema),
+  authGuard(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER),
+  authController.resetPassword
 )
 
 export const authRoutes = router

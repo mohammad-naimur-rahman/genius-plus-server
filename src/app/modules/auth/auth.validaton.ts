@@ -40,11 +40,19 @@ const resetForgetPasswordZSchema = z.object({
   })
 })
 
+const resetPasswordZSchema = z.object({
+  body: z.object({
+    password: z.string().regex(signUpRegex),
+    new_password: z.string().regex(signUpRegex)
+  })
+})
+
 export const authValidation = {
   createUserSchema,
   verifySignupZSchema,
   loginUserZSChema,
   forgetPassWordZSchema,
   verifyForgetPasswordZSchema,
-  resetForgetPasswordZSchema
+  resetForgetPasswordZSchema,
+  resetPasswordZSchema
 }

@@ -2,6 +2,7 @@ import ms from 'ms'
 import envVars from '~configs'
 import catchAsync from '~shared/catchAsync'
 import sendResponse from '~shared/sendResponse'
+import { ReqWithUser } from '~types/common'
 import httpStatus from '~utils/httpStatus'
 import { authService } from './auth.service'
 
@@ -122,11 +123,25 @@ const resetForgetPassword = catchAsync(async (req, res) => {
   })
 })
 
+const resetPassword = catchAsync(async (req, res) => {
+  const updatedUser = await authService.resetPassword(
+    req.body,
+    (req as ReqWithUser).user
+  )
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Password reset successful!',
+    data: updatedUser
+  })
+})
+
 export const authController = {
   signup,
   signupVerify,
   login,
   forgetPassword,
   forgetPasswordVerify,
-  resetForgetPassword
+  resetForgetPassword,
+  resetPassword
 }

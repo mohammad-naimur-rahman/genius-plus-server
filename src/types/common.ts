@@ -17,6 +17,6 @@ export type IGenericErrorResponse = {
   errorMessages: IGenericErrorMessage[]
 }
 
-export interface RequestWithUser extends Request {
+export interface ReqWithUser extends Request {
   user: JwtPayload
 }

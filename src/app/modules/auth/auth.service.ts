@@ -184,11 +184,58 @@ const resetForgetPassword = async (body: {
   return { user: updatedUser[0], tokens: { accessToken, refreshToken } }
 }
 
+const resetPassword = async (
+  body: {
+    email: string
+    password: string
+    new_password: string
+  },
+  reqUser: JwtPayload
+) => {
+  const { password, new_password } = body
+
+  if (password === new_password) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'New password and old password cannot be same!'
+    )
+  }
+
+  const requestedUser = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.id, reqUser.userId)
+  })
+
+  if (!requestedUser) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "User doesn't exist with this email!"
+    )
+  }
+
+  const validPassword = authUtils.verifyPassword(
+    password,
+    requestedUser.password
+  )
+  if (!validPassword) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong password provided!')
+  }
+
+  const hashedPassword = authUtils.hashPassword(new_password)
+  const updatedUser = await db
+    .update(user)
+    .set({ password: hashedPassword })
+    .where(eq(user.id, reqUser.userId))
+    .returning()
+
+  return updatedUser[0]
+}
+
 export const authService = {
   signup,
   signupVerify,
   login,
   forgetPassword,
   forgetPasswordVerify,
-  resetForgetPassword
+  resetForgetPassword,
+  resetPassword
 }
