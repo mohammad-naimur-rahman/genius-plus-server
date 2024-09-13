@@ -1,45 +1,85 @@
 import crypto from 'crypto'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import ms from 'ms'
 import envVars from '~configs'
-import ApiError from '~utils/errorHandlers/ApiError'
 import { NewUser } from '../users/user.schema'
 
+const algorithm = 'aes-256-cbc'
+const key = crypto
+  .createHash('sha256')
+  .update(envVars.auth.cryptoSecret!)
+  .digest()
+const ivLength = 16
+
 const generateVerificationLink = (user: NewUser) => {
+  const iv = crypto.randomBytes(ivLength)
+  const expirationTime = ms(envVars.ses.verificationLinkExpiresIn)
+  const expires_at = Date.now() + expirationTime
+  const payload = { ...user, expires_at }
+  const cipher = crypto.createCipheriv(algorithm, key, iv)
+  let encrypted = cipher.update(JSON.stringify(payload), 'utf8', 'hex')
+  encrypted += cipher.final('hex')
+  const encryptedData = iv.toString('hex') + ':' + encrypted
+  const confirmationLink = `${envVars.ses.emailVerifyRedirectUrl}${encodeURIComponent(encryptedData)}`
+  return confirmationLink
+}
+
+const decryptVerificationLink = (encryptedData: string) => {
   try {
-    const secretKey = crypto
-      .createHash('sha256')
-      .update(envVars.auth.cryptoSecret!)
-      .digest('base64')
-      .substring(0, 32) // Ensure 32-byte key
-    const iv = crypto.randomBytes(16) // IV should be 16 bytes for aes-256-cbc
-    const expirationTime = ms(envVars.ses.verificationLinkExpiresIn) // e.g., '30m' from .env
-    const expirationDate = Date.now() + expirationTime // Calculate expiration timestamp
-
-    const payload = {
-      ...user,
-      expiresAt: expirationDate // Add expiration time to payload
+    const [ivHex, encrypted] = decodeURIComponent(encryptedData).split(':')
+    const iv = Buffer.from(ivHex, 'hex')
+    const decipher = crypto.createDecipheriv(algorithm, key, iv)
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8')
+    decrypted += decipher.final('utf8')
+    const payload = JSON.parse(decrypted)
+    if (Date.now() > payload.expires_at) {
+      throw new Error('Verification link has expired!')
     }
-
-    const cipher = crypto.createCipheriv(
-      'aes-256-cbc',
-      Buffer.from(secretKey),
-      iv
-    )
-
-    let encryptedUser = cipher.update(
-      JSON.stringify(payload), // Encrypt user data with expiration
-      'utf-8',
-      'hex'
-    )
-    encryptedUser += cipher.final('hex')
-
-    const confirmationLink = `${envVars.ses.emailVerifyRedirectUrl}${encodeURIComponent(encryptedUser)}`
-    return confirmationLink
-  } catch {
-    throw new ApiError(400, 'Error generating verification link')
+    return payload
+  } catch (error) {
+    console.error('Error decrypting or parsing the verification link:', error)
+    throw new Error('Invalid verification link')
   }
 }
 
+const hashPassword = (password: string) => {
+  const salt = crypto.randomBytes(16).toString('hex')
+  const hash = crypto
+    .pbkdf2Sync(password, salt, 1000, 64, 'sha512')
+    .toString('hex')
+  return `${salt}:${hash}`
+}
+
+const verifyPassword = (password: string, storedHash: string) => {
+  const [salt, originalHash] = storedHash.split(':')
+  const hashVerify = crypto
+    .pbkdf2Sync(password, salt, 1000, 64, 'sha512')
+    .toString('hex')
+  return originalHash === hashVerify
+}
+
+const generateToken = (
+  payload: Record<string, unknown>,
+  type: 'access' | 'refresh'
+) => {
+  const token = jwt.sign(payload, envVars.jwt.jwtSecret, {
+    expiresIn:
+      type === 'access'
+        ? envVars.jwt.jwtAccessExpiresIn
+        : envVars.jwt.jwtRefreshExpiresIn
+  })
+  return token
+}
+
+const verifyToken = (token: string): JwtPayload => {
+  return jwt.verify(token, envVars.jwt.jwtSecret) as JwtPayload
+}
+
 export const authUtils = {
-  generateVerificationLink
+  generateVerificationLink,
+  decryptVerificationLink,
+  hashPassword,
+  verifyPassword,
+  generateToken,
+  verifyToken
 }

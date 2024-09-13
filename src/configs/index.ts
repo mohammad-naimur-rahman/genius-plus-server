@@ -25,8 +25,7 @@ const envSchema = z.object({
   DB_PREFIX: z.string(),
   BCRYPT_SALT_ROUNDS: z.string().refine(val => Number(val)),
   JWT_SECRET: z.string(),
-  JWT_EXPIRES_IN: z.string(),
-  JWT_REFRESH_SECRET: z.string(),
+  JWT_ACCESS_EXPIRES_IN: z.string(),
   JWT_REFRESH_EXPIRES_IN: z.string(),
   CRYPTO_SECRET: z.string(),
   EMAIL_VERIFY_REDIRECT_URL: z.string().url(),
@@ -61,8 +60,7 @@ const envVars = {
   },
   jwt: {
     jwtSecret: envServer.data.JWT_SECRET,
-    jwtExpiresIn: envServer.data.JWT_EXPIRES_IN,
-    jwtRefreshSecret: envServer.data.JWT_REFRESH_SECRET,
+    jwtAccessExpiresIn: envServer.data.JWT_ACCESS_EXPIRES_IN,
     jwtRefreshExpiresIn: envServer.data.JWT_REFRESH_EXPIRES_IN
   },
   auth: {
