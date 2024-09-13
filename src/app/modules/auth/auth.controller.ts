@@ -124,10 +124,8 @@ const resetForgetPassword = catchAsync(async (req, res) => {
 })
 
 const resetPassword = catchAsync(async (req, res) => {
-  const updatedUser = await authService.resetPassword(
-    req.body,
-    (req as ReqWithUser).user
-  )
+  const { body, user } = req as ReqWithUser
+  const updatedUser = await authService.resetPassword(body, user)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -25,10 +25,13 @@ const todo = createTable('todos', {
     .references(() => user.id),
   date: date('date', { mode: 'string' }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
-  description: text('description').notNull(),
-  time_ranage: varchar('time_range', { length: 255 }).notNull(),
+  description: text('description'),
+  time_range: varchar('time_range', { length: 255 }).notNull(),
   priority: todoPriorityEnum('priority').notNull(),
   is_complete: boolean('is_complete').default(false)
 })
+
+export type Todo = typeof todo.$inferSelect
+export type NewTodo = typeof todo.$inferInsert
 
 export default todo

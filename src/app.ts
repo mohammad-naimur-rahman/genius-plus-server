@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express, { Application, NextFunction, Request, Response } from 'express'
 import globalErrorHandler from '~app/middlewares/globalErrorHandler'
+import { processQuery } from '~app/middlewares/processQuery'
 import requestLogger from '~app/middlewares/requestLogger'
 import router from '~app/routes'
 import httpStatus from '~utils/httpStatus'
@@ -11,6 +12,7 @@ const app: Application = express()
 // Middlewares
 app.use(cors())
 app.use(cookieParser())
+app.use(processQuery)
 app.use(requestLogger)
 
 // Parser
