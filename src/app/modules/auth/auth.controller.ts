@@ -136,6 +136,32 @@ const resetPassword = catchAsync(async (req, res) => {
   })
 })
 
+const generateNewAccessToken = catchAsync(async (req, res) => {
+  const { accessToken, refreshToken } =
+    await authService.generateNewAccessToken(req.body)
+
+  // Set cookies
+  res.cookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: envVars.env === 'production',
+    sameSite: 'strict',
+    maxAge: ms(envVars.jwt.jwtAccessExpiresIn)
+  })
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: envVars.env === 'production',
+    sameSite: 'strict',
+    maxAge: ms(envVars.jwt.jwtRefreshExpiresIn)
+  })
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'New access token generated successfully!',
+    data: { tokens: { accessToken, refreshToken } }
+  })
+})
+
 export const authController = {
   signup,
   signupVerify,
@@ -143,5 +169,6 @@ export const authController = {
   forgetPassword,
   forgetPasswordVerify,
   resetForgetPassword,
-  resetPassword
+  resetPassword,
+  generateNewAccessToken
 }

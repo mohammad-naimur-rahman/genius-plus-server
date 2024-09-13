@@ -50,6 +50,12 @@ const resetPasswordZSchema = z.object({
   })
 })
 
+const generateNewAccessTokenZSchema = z.object({
+  body: z.object({
+    refreshToken: z.string().regex(jwtRegex)
+  })
+})
+
 export const authValidation = {
   createUserSchema,
   verifySignupZSchema,
@@ -57,5 +63,6 @@ export const authValidation = {
   forgetPassWordZSchema,
   verifyForgetPasswordZSchema,
   resetForgetPasswordZSchema,
-  resetPasswordZSchema
+  resetPasswordZSchema,
+  generateNewAccessTokenZSchema
 }

@@ -230,6 +230,39 @@ const resetPassword = async (
   return updatedUser[0]
 }
 
+const generateNewAccessToken = async (body: { refreshToken: string }) => {
+  const { refreshToken } = body
+
+  const token = refreshToken?.split(' ')[1]
+
+  if (token === 'undefined') {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized!')
+  }
+
+  const verifiedToken = authUtils.verifyToken(token)
+  if (!verifiedToken) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid token!')
+  }
+
+  const user = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.id, verifiedToken.userId)
+  })
+  if (!user) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User doesn't exist!")
+  }
+
+  const accessToken = authUtils.generateToken(
+    { userId: user.id, role: user.role },
+    'access'
+  )
+
+  const newRefreshToken = authUtils.generateToken(
+    { userId: user.id },
+    'refresh'
+  )
+  return { accessToken, refreshToken: newRefreshToken }
+}
+
 export const authService = {
   signup,
   signupVerify,
@@ -237,5 +270,6 @@ export const authService = {
   forgetPassword,
   forgetPasswordVerify,
   resetForgetPassword,
-  resetPassword
+  resetPassword,
+  generateNewAccessToken
 }

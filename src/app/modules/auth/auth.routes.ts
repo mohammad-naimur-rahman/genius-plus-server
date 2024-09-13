@@ -40,5 +40,10 @@ router.post(
   authGuard(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER),
   authController.resetPassword
 )
+router.post(
+  '/access-token',
+  validateRequest(authValidation.generateNewAccessTokenZSchema),
+  authController.generateNewAccessToken
+)
 
 export const authRoutes = router
