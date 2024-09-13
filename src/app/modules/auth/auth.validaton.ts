@@ -2,6 +2,7 @@ import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { jwtRegex, signUpRegex } from '~constants/regex'
 import { user } from '~db/schema'
+import { headerToken } from '~utils/validationUtils'
 
 const createUserSchema = createInsertSchema(user, {
   password: schema => schema.password.regex(signUpRegex),
@@ -41,9 +42,7 @@ const resetForgetPasswordZSchema = z.object({
 })
 
 const resetPasswordZSchema = z.object({
-  headers: z.object({
-    authorization: z.string().regex(jwtRegex)
-  }),
+  ...headerToken,
   body: z.object({
     password: z.string().regex(signUpRegex),
     new_password: z.string().regex(signUpRegex)
