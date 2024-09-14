@@ -64,8 +64,17 @@ const createTodoWithAI = async (
 
   const todos = JSON.parse(todoJSON)
 
-  if (Array.isArray(todos) && todos.length === 0) {
+  if (!Array.isArray(todos)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'No todos found in the response')
+  }
+
+  const hasError = todos.find((todo: NewTodo) => todo.title === 'ERROR')
+
+  if (hasError) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      hasError.description || 'Something went wrong, try again!'
+    )
   }
 
   const newTodos = await db
