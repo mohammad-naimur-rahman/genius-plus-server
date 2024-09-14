@@ -5,7 +5,7 @@ import { ReqWithUser } from '~types/common'
 import httpStatus from '~utils/httpStatus'
 import { todoService } from './todo.service'
 
-export const createTodo = catchAsync(async (req, res) => {
+const createTodo = catchAsync(async (req, res) => {
   const { body, user } = req as ReqWithUser
   const newTodo = await todoService.createTodo(body, user)
 
@@ -16,7 +16,18 @@ export const createTodo = catchAsync(async (req, res) => {
   })
 })
 
-export const getAllTodos = catchAsync(async (req, res) => {
+const createTodoWithAI = catchAsync(async (req, res) => {
+  const { body, user } = req as ReqWithUser
+  const newTodo = await todoService.createTodoWithAI(body, user)
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    message: 'Todo created successfully for the day!',
+    data: newTodo
+  })
+})
+
+const getAllTodos = catchAsync(async (req, res) => {
   const { query, user } = req as ReqWithUser
   const todos = await todoService.getAllTodos(query as { date?: string }, user)
 
@@ -27,7 +38,7 @@ export const getAllTodos = catchAsync(async (req, res) => {
   })
 })
 
-export const updateTodo = catchAsync(async (req, res) => {
+const updateTodo = catchAsync(async (req, res) => {
   const {
     params: { id },
     body,
@@ -42,7 +53,7 @@ export const updateTodo = catchAsync(async (req, res) => {
   })
 })
 
-export const deleteTodo = catchAsync(async (req: Request, res: Response) => {
+const deleteTodo = catchAsync(async (req: Request, res: Response) => {
   const {
     params: { id },
     user
@@ -51,9 +62,17 @@ export const deleteTodo = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.NO_CONTENT).send()
 })
 
+const deleteTodoForTheDay = catchAsync(async (req: Request, res: Response) => {
+  const { user } = req as ReqWithUser
+  await todoService.deleteTodoForTheDay(user)
+  res.status(httpStatus.NO_CONTENT).send()
+})
+
 export const todoController = {
   createTodo,
+  createTodoWithAI,
   getAllTodos,
   updateTodo,
-  deleteTodo
+  deleteTodo,
+  deleteTodoForTheDay
 }

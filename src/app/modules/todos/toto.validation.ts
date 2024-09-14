@@ -12,6 +12,13 @@ const createTodoZSchema = z.object({
   })
 })
 
+const createTodoWithAIZSchema = z.object({
+  ...headerToken,
+  body: z.object({
+    text: z.string()
+  })
+})
+
 const getAllTodosZSchema = z.object({
   ...headerToken,
   params: z.object({
@@ -37,7 +44,7 @@ const updateTodoZSchema = z.object({
 const deleteTodoZSchema = z.object({
   ...headerToken,
   params: z.object({
-    id: z.number()
+    id: z.string().refine(v => Number(v))
   })
 })
 
@@ -45,5 +52,6 @@ export const todoValidation = {
   createTodoZSchema,
   getAllTodosZSchema,
   updateTodoZSchema,
-  deleteTodoZSchema
+  deleteTodoZSchema,
+  createTodoWithAIZSchema
 }

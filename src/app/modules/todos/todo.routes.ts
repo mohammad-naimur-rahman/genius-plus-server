@@ -20,6 +20,19 @@ router
     todoController.createTodo
   )
 
+router.post(
+  '/create-with-ai',
+  authGuard(ENUM_USER_ROLE.USER),
+  validateRequest(todoValidation.createTodoWithAIZSchema),
+  todoController.createTodoWithAI
+)
+
+router.delete(
+  '/delete-the-day',
+  authGuard(ENUM_USER_ROLE.USER),
+  todoController.deleteTodoForTheDay
+)
+
 router
   .route('/:id')
   .patch(

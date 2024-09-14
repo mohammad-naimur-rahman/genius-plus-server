@@ -1,10 +1,14 @@
 import { and, eq } from 'drizzle-orm'
 import { JwtPayload } from 'jsonwebtoken'
+import { openaiPrompts } from '~constants/openaiPrompts'
 import { db } from '~db'
+import ApiError from '~utils/errorHandlers/ApiError'
+import httpStatus from '~utils/httpStatus'
+import { isValidJSON } from '~utils/isValidSomething'
+import { openai } from '~utils/openai'
 import todo, { NewTodo } from './todo.schema'
 
 const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
-  console.log(body)
   const newTodo = await db
     .insert(todo)
     .values({
@@ -14,6 +18,68 @@ const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
     })
     .returning()
   return newTodo[0]
+}
+
+const createTodoWithAI = async (
+  body: { text: string },
+  reqUser: JwtPayload
+) => {
+  const { text } = body
+
+  const todoExists = await db.query.todo.findFirst({
+    where: and(
+      eq(todo.user_id, reqUser.userId),
+      eq(todo.date, new Date().toISOString())
+    )
+  })
+
+  if (todoExists) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Try in an empty todo list or delete the old ones!'
+    )
+  }
+
+  const completion = await openai.chat.completions.create({
+    messages: [
+      {
+        role: 'system',
+        content: openaiPrompts.todoForaDay()
+      },
+      { role: 'user', content: text }
+    ],
+    model: 'gpt-4o'
+  })
+
+  const todoJSON = completion.choices[0].message.content
+
+  const isValid = todoJSON && isValidJSON(todoJSON)
+
+  if (!isValid) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Something went wrong, try again!'
+    )
+  }
+
+  const todos = JSON.parse(todoJSON)
+
+  if (Array.isArray(todos) && todos.length === 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'No todos found in the response')
+  }
+
+  const newTodos = await db
+    .insert(todo)
+    .values(
+      todos.map((todo: NewTodo) => ({
+        ...todo,
+        user_id: reqUser.userId,
+        date: new Date().toISOString()
+      }))
+    )
+    .returning()
+
+  return newTodos
 }
 
 const getAllTodos = async (query: { date?: string }, reqUser: JwtPayload) => {
@@ -27,6 +93,7 @@ const getAllTodos = async (query: { date?: string }, reqUser: JwtPayload) => {
   })
   return allTodos
 }
+
 const updateTodo = async (
   id: number,
   body: Partial<NewTodo>,
@@ -39,11 +106,23 @@ const updateTodo = async (
     .returning()
   return updatedTodo[0]
 }
+
 const deleteTodo = async (id: number, reqUser: JwtPayload) => {
   await db
     .delete(todo)
     .where(and(eq(todo.id, id), eq(todo.user_id, reqUser.userId)))
-    .returning()
+  return null
+}
+
+const deleteTodoForTheDay = async (reqUser: JwtPayload) => {
+  await db
+    .delete(todo)
+    .where(
+      and(
+        eq(todo.date, new Date().toISOString()),
+        eq(todo.user_id, reqUser.userId)
+      )
+    )
   return null
 }
 
@@ -51,5 +130,7 @@ export const todoService = {
   createTodo,
   getAllTodos,
   updateTodo,
-  deleteTodo
+  deleteTodo,
+  createTodoWithAI,
+  deleteTodoForTheDay
 }
