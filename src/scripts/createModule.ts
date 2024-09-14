@@ -15,7 +15,7 @@ const createModule = (moduleName: string) => {
   // Create the module folder if it doesn't exist
   if (!fs.existsSync(modulePath)) {
     fs.mkdirSync(modulePath, { recursive: true })
-    console.log(chalk.green(`Created folder: ${folderName}`))
+    console.log(chalk.cyanBright(`Created folder: ${folderName}\n`))
   } else {
     console.log(chalk.yellow(`Folder ${folderName} already exists`))
   }
@@ -38,7 +38,7 @@ const createModule = (moduleName: string) => {
 
   // Final success message
   console.log(
-    chalk.blue.bold(`\nModule "${moduleName}" has been set up successfully.`)
+    chalk.blue.bold(`\nModule "${moduleName}" has been set up successfully. ✨`)
   )
 }
 

@@ -10,7 +10,7 @@ const todoTemplate = createTable('todo_templates', {
     .references(() => user.id),
   title: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
-  instructin: text('instructin').notNull()
+  instructions: text('instructions').notNull()
 })
 
 export type TodoTemplate = typeof todoTemplate.$inferSelect
