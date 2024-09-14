@@ -1,3 +1,4 @@
+import chalk from 'chalk'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -14,9 +15,9 @@ const createModule = (moduleName: string) => {
   // Create the module folder if it doesn't exist
   if (!fs.existsSync(modulePath)) {
     fs.mkdirSync(modulePath, { recursive: true })
-    console.log(`Created folder: ${modulePath}`)
+    console.log(chalk.green(`Created folder: ${folderName}`))
   } else {
-    console.log(`Folder ${modulePath} already exists`)
+    console.log(chalk.yellow(`Folder ${folderName} already exists`))
   }
 
   // Create the necessary files
@@ -25,17 +26,27 @@ const createModule = (moduleName: string) => {
     const fileName = `${singularName}.${fileType}.ts`
     const filePath = path.join(modulePath, fileName)
 
-    // Create an empty file
-    fs.writeFileSync(filePath, '')
-    console.log(`Created file: ${filePath}`)
+    // Check if the file already exists
+    if (!fs.existsSync(filePath)) {
+      // Create an empty file
+      fs.writeFileSync(filePath, '')
+      console.log(chalk.green(`Created file: ${fileName}`))
+    } else {
+      console.log(chalk.yellow(`File ${fileName} already exists, skipping...`))
+    }
   })
+
+  // Final success message
+  console.log(
+    chalk.blue.bold(`\nModule "${moduleName}" has been set up successfully.`)
+  )
 }
 
 // Get the module name from the command line argument
 const moduleName = process.argv[2]
 
 if (!moduleName) {
-  console.error('Please provide a module name.')
+  console.error(chalk.red('Please provide a module name.'))
   process.exit(1)
 }
 
