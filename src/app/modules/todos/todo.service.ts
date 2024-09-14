@@ -9,12 +9,20 @@ import { openai } from '~utils/openai'
 import todo, { NewTodo } from './todo.schema'
 
 const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
+  const previousTodoLength = await db.query.todo.findMany({
+    where: and(
+      eq(todo.user_id, reqUser.userId),
+      eq(todo.date, new Date().toISOString())
+    )
+  })
+
   const newTodo = await db
     .insert(todo)
     .values({
       ...body,
       user_id: reqUser.userId,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      order: previousTodoLength.length + 1
     })
     .returning()
   return newTodo[0]
@@ -80,10 +88,11 @@ const createTodoWithAI = async (
   const newTodos = await db
     .insert(todo)
     .values(
-      todos.map((todo: NewTodo) => ({
+      todos.map((todo: NewTodo, order: number) => ({
         ...todo,
         user_id: reqUser.userId,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        order: order + 1
       }))
     )
     .returning()
