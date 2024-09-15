@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { CookieOptions, Response } from 'express'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import ms from 'ms'
 import envVars from '~configs'
@@ -74,11 +75,33 @@ const verifyToken = (token: string): JwtPayload => {
   return jwt.verify(token, envVars.jwt.jwtSecret) as JwtPayload
 }
 
+const setCookies = (
+  res: Response,
+  accessToken: string,
+  refreshToken: string
+): void => {
+  const cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: envVars.env === 'production',
+    sameSite: 'strict'
+  }
+
+  res.cookie('accessToken', accessToken, {
+    ...cookieOptions,
+    maxAge: ms(envVars.jwt.jwtAccessExpiresIn)
+  })
+
+  res.cookie('refreshToken', refreshToken, {
+    ...cookieOptions,
+    maxAge: ms(envVars.jwt.jwtRefreshExpiresIn)
+  })
+}
 export const authUtils = {
   generateVerificationLink,
   decryptVerificationLink,
   hashPassword,
   verifyPassword,
   generateToken,
-  verifyToken
+  verifyToken,
+  setCookies
 }

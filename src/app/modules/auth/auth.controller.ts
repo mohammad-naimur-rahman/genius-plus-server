@@ -1,10 +1,9 @@
-import ms from 'ms'
-import envVars from '~configs'
 import catchAsync from '~shared/catchAsync'
 import sendResponse from '~shared/sendResponse'
 import { ReqWithUser } from '~types/common'
 import httpStatus from '~utils/httpStatus'
 import { authService } from './auth.service'
+import { authUtils } from './auth.utils'
 
 const signup = catchAsync(async (req, res) => {
   const verificationLink = await authService.signup(req.body)
@@ -24,19 +23,7 @@ const signupVerify = catchAsync(async (req, res) => {
   const { accessToken, refreshToken } = tokens
 
   // Set cookies
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    secure: envVars.env === 'production',
-    sameSite: 'strict',
-    maxAge: ms(envVars.jwt.jwtAccessExpiresIn)
-  })
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: envVars.env === 'production',
-    sameSite: 'strict',
-    maxAge: ms(envVars.jwt.jwtRefreshExpiresIn)
-  })
+  authUtils.setCookies(res, accessToken, refreshToken)
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -53,19 +40,7 @@ const login = catchAsync(async (req, res) => {
   const { accessToken, refreshToken } = tokens
 
   // Set cookies
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    secure: envVars.env === 'production',
-    sameSite: 'strict',
-    maxAge: ms(envVars.jwt.jwtAccessExpiresIn)
-  })
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: envVars.env === 'production',
-    sameSite: 'strict',
-    maxAge: ms(envVars.jwt.jwtRefreshExpiresIn)
-  })
+  authUtils.setCookies(res, accessToken, refreshToken)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -102,19 +77,7 @@ const resetForgetPassword = catchAsync(async (req, res) => {
   const { accessToken, refreshToken } = tokens
 
   // Set cookies
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    secure: envVars.env === 'production',
-    sameSite: 'strict',
-    maxAge: ms(envVars.jwt.jwtAccessExpiresIn)
-  })
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: envVars.env === 'production',
-    sameSite: 'strict',
-    maxAge: ms(envVars.jwt.jwtRefreshExpiresIn)
-  })
+  authUtils.setCookies(res, accessToken, refreshToken)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -139,19 +102,7 @@ const generateNewAccessToken = catchAsync(async (req, res) => {
     await authService.generateNewAccessToken(req.body)
 
   // Set cookies
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    secure: envVars.env === 'production',
-    sameSite: 'strict',
-    maxAge: ms(envVars.jwt.jwtAccessExpiresIn)
-  })
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: envVars.env === 'production',
-    sameSite: 'strict',
-    maxAge: ms(envVars.jwt.jwtRefreshExpiresIn)
-  })
+  authUtils.setCookies(res, accessToken, refreshToken)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
