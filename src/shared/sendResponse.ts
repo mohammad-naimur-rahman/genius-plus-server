@@ -9,6 +9,10 @@ type IApiReponse<T> = {
     limit: number
     total: number
   }
+  tokens?: {
+    accessToken: string
+    refreshToken: string
+  }
   data?: T | null
 }
 
@@ -18,7 +22,8 @@ const sendResponse = <T>(res: Response, data: IApiReponse<T>): void => {
     success: data.success || true,
     message: data.message || null,
     meta: data.meta || null || undefined,
-    data: data.data || null || undefined
+    data: data.data || null || undefined,
+    tokens: data.tokens || undefined
   }
 
   res.status(data.statusCode).json(responseData)

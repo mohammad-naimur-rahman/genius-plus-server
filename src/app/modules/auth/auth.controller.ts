@@ -16,10 +16,10 @@ const signup = catchAsync(async (req, res) => {
 })
 
 const signupVerify = catchAsync(async (req, res) => {
-  const newUser = await authService.signupVerify(req.body)
+  const data = await authService.signupVerify(req.body)
 
   // Setting and sending cookies after verificatin so that user doesn't have to login again
-  const { tokens } = newUser
+  const { tokens, user } = data
   const { accessToken, refreshToken } = tokens
 
   // Set cookies
@@ -28,15 +28,16 @@ const signupVerify = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     message: 'User verification successful!',
-    data: newUser
+    data: user,
+    tokens: tokens
   })
 })
 
 const login = catchAsync(async (req, res) => {
-  const loggedInUser = await authService.login(req.body)
+  const data = await authService.login(req.body)
 
   // Setting and sending cookies after verificatin so that user doesn't have to login again
-  const { tokens } = loggedInUser
+  const { tokens, user } = data
   const { accessToken, refreshToken } = tokens
 
   // Set cookies
@@ -45,7 +46,8 @@ const login = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'User logged in successful!',
-    data: loggedInUser
+    data: user,
+    tokens
   })
 })
 
@@ -73,7 +75,7 @@ const resetForgetPassword = catchAsync(async (req, res) => {
   const updateduser = await authService.resetForgetPassword(req.body)
 
   // Setting and sending cookies after verificatin so that user doesn't have to login again
-  const { tokens } = updateduser
+  const { tokens, user } = updateduser
   const { accessToken, refreshToken } = tokens
 
   // Set cookies
@@ -82,7 +84,8 @@ const resetForgetPassword = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Password reset successful!',
-    data: updateduser
+    data: user,
+    tokens
   })
 })
 
@@ -107,7 +110,7 @@ const generateNewAccessToken = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'New access token generated successfully!',
-    data: { tokens: { accessToken, refreshToken } }
+    tokens: { accessToken, refreshToken }
   })
 })
 
