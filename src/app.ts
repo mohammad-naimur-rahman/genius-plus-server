@@ -5,12 +5,13 @@ import globalErrorHandler from '~app/middlewares/globalErrorHandler'
 import { processQuery } from '~app/middlewares/processQuery'
 import requestLogger from '~app/middlewares/requestLogger'
 import router from '~app/routes'
+import envVars from '~configs'
 import httpStatus from '~utils/httpStatus'
 
 const app: Application = express()
 
 // Middlewares
-app.use(cors())
+app.use(cors({ origin: envVars.clientUrl.split('/en')[0], credentials: true }))
 app.use(cookieParser())
 app.use(processQuery)
 app.use(requestLogger)

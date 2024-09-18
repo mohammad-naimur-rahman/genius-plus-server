@@ -83,7 +83,8 @@ const setCookies = (
   const cookieOptions: CookieOptions = {
     httpOnly: true,
     secure: envVars.env === 'production',
-    sameSite: 'strict'
+    sameSite: 'lax',
+    domain: envVars.clientUrl.split('/en')[0]
   }
 
   res.cookie('accessToken', accessToken, {
@@ -96,6 +97,7 @@ const setCookies = (
     maxAge: ms(envVars.jwt.jwtRefreshExpiresIn)
   })
 }
+
 export const authUtils = {
   generateVerificationLink,
   decryptVerificationLink,

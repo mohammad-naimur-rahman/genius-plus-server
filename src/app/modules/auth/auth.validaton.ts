@@ -12,7 +12,7 @@ const createUserSchema = createInsertSchema(user, {
 const loginUserZSChema = z.object({
   body: z.object({
     email: z.string().email(),
-    password: z.string().regex(signUpRegex)
+    password: z.string()
   })
 })
 
