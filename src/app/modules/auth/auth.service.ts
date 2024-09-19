@@ -26,14 +26,12 @@ const signup = async (body: NewUser) => {
   )
 
   const emailText = `Hi there!
-
-        Welcome to ${envVars.name}. You've just signed up for a new account.
-        Please click the link below to verify your email:
-
-        ${emailVerificationLink}
+Welcome to ${envVars.name}. You've just signed up for a new account.
+Please click the link below to verify your email:
+${emailVerificationLink}
         
-        Regards,
-        The ${process.env.NAME} Team`
+Regards,
+The ${process.env.NAME} Team`
   const emailSubject = `Verify your account at ${envVars.name}`
   const emailStatus = await sendEmail(body.email, emailText, emailSubject)
 
@@ -115,14 +113,12 @@ const forgetPassword = async (body: { email: string }) => {
   }>({ email }, envVars.ses.forgetPasswordVerifyRedirectUrl)
 
   const emailText = `Hi there!
-
-        Welcome to ${envVars.name}. You've requested to reset your account password.
-        Please click the link below to verify your email:
-
-        ${emailVerificationLink}
-        
-        Regards,
-        The ${process.env.NAME} Team`
+Welcome to ${envVars.name}. You've requested to reset your account password.
+Please click the link below to verify your email:
+${emailVerificationLink}
+ 
+Regards,
+The ${process.env.NAME} Team`
   const emailSubject = `Forget password? Verify your account at ${envVars.name}`
   const emailStatus = await sendEmail(body.email, emailText, emailSubject)
 
