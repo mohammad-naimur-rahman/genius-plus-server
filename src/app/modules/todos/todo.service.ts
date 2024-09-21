@@ -10,10 +10,11 @@ import { openai } from '~utils/openai'
 import todo, { NewTodo } from './todo.schema'
 
 const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
+  const { date } = { ...body }
   const previousTodoLength = await db.query.todo.findMany({
     where: and(
       eq(todo.user_id, reqUser.userId),
-      eq(todo.date, formatDate(new Date()))
+      eq(todo.date, date || formatDate(new Date()))
     )
   })
 
@@ -22,7 +23,7 @@ const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
     .values({
       ...body,
       user_id: reqUser.userId,
-      date: formatDate(new Date()),
+      date: date || formatDate(new Date()),
       order: previousTodoLength.length + 1
     })
     .returning()
@@ -30,15 +31,15 @@ const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
 }
 
 const createTodoWithAI = async (
-  body: { text: string },
+  body: { text: string; date?: string },
   reqUser: JwtPayload
 ) => {
-  const { text } = body
+  const { text, date } = body
 
   const todoExists = await db.query.todo.findFirst({
     where: and(
       eq(todo.user_id, reqUser.userId),
-      eq(todo.date, formatDate(new Date()))
+      eq(todo.date, date || formatDate(new Date()))
     )
   })
 
@@ -92,7 +93,7 @@ const createTodoWithAI = async (
       todos.map((todo: NewTodo, order: number) => ({
         ...todo,
         user_id: reqUser.userId,
-        date: formatDate(new Date()),
+        date: date || formatDate(new Date()),
         order: order + 1
       }))
     )
@@ -134,13 +135,16 @@ const deleteTodo = async (id: number, reqUser: JwtPayload) => {
   return null
 }
 
-const deleteTodoForTheDay = async (reqUser: JwtPayload) => {
-  console.log(formatDate(new Date()))
+const deleteTodoForTheDay = async (
+  query: { date?: string },
+  reqUser: JwtPayload
+) => {
+  const { date } = { ...query }
   await db
     .delete(todo)
     .where(
       and(
-        eq(todo.date, formatDate(new Date())),
+        eq(todo.date, date || formatDate(new Date())),
         eq(todo.user_id, reqUser.userId)
       )
     )

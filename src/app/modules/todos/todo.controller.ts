@@ -63,8 +63,8 @@ const deleteTodo = catchAsync(async (req: Request, res: Response) => {
 })
 
 const deleteTodoForTheDay = catchAsync(async (req: Request, res: Response) => {
-  const { user } = req as ReqWithUser
-  await todoService.deleteTodoForTheDay(user)
+  const { user, query } = req as ReqWithUser
+  await todoService.deleteTodoForTheDay(query, user)
   res.status(httpStatus.NO_CONTENT).send()
 })
 
