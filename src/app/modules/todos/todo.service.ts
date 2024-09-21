@@ -1,7 +1,8 @@
-import { and, eq } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 import { JwtPayload } from 'jsonwebtoken'
 import { openaiPrompts } from '~constants/openaiPrompts'
 import { db } from '~db'
+import { formatDate } from '~utils/dateTimteUtils'
 import ApiError from '~utils/errorHandlers/ApiError'
 import httpStatus from '~utils/httpStatus'
 import { isValidJSON } from '~utils/isValidSomething'
@@ -12,7 +13,7 @@ const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
   const previousTodoLength = await db.query.todo.findMany({
     where: and(
       eq(todo.user_id, reqUser.userId),
-      eq(todo.date, new Date().toISOString())
+      eq(todo.date, formatDate(new Date()))
     )
   })
 
@@ -21,7 +22,7 @@ const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
     .values({
       ...body,
       user_id: reqUser.userId,
-      date: new Date().toISOString(),
+      date: formatDate(new Date()),
       order: previousTodoLength.length + 1
     })
     .returning()
@@ -37,7 +38,7 @@ const createTodoWithAI = async (
   const todoExists = await db.query.todo.findFirst({
     where: and(
       eq(todo.user_id, reqUser.userId),
-      eq(todo.date, new Date().toISOString())
+      eq(todo.date, formatDate(new Date()))
     )
   })
 
@@ -91,7 +92,7 @@ const createTodoWithAI = async (
       todos.map((todo: NewTodo, order: number) => ({
         ...todo,
         user_id: reqUser.userId,
-        date: new Date().toISOString(),
+        date: formatDate(new Date()),
         order: order + 1
       }))
     )
@@ -105,9 +106,10 @@ const getAllTodos = async (query: { date?: string }, reqUser: JwtPayload) => {
   const allTodos = await db.query.todo.findMany({
     where: (todo, { eq, and }) =>
       and(
-        eq(todo.date, date || new Date().toISOString()),
+        eq(todo.date, date || formatDate(new Date())),
         eq(todo.user_id, reqUser.userId)
-      )
+      ),
+    orderBy: asc(todo.order)
   })
   return allTodos
 }
@@ -133,11 +135,12 @@ const deleteTodo = async (id: number, reqUser: JwtPayload) => {
 }
 
 const deleteTodoForTheDay = async (reqUser: JwtPayload) => {
+  console.log(formatDate(new Date()))
   await db
     .delete(todo)
     .where(
       and(
-        eq(todo.date, new Date().toISOString()),
+        eq(todo.date, formatDate(new Date())),
         eq(todo.user_id, reqUser.userId)
       )
     )
