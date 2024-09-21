@@ -7,16 +7,21 @@ export const processQuery = (
 ) => {
   if (req?.query) {
     for (const item in req.query) {
-      if (req.query[item] === 'true') {
-        ;(req.query[item] as unknown) = true
-      } else if (req.query[item] === 'false') {
-        ;(req.query[item] as unknown) = false
-      } else if (req.query[item] === 'undefined') {
-        ;(req.query[item] as unknown) = undefined
-      } else if (req.query[item] === 'null') {
-        ;(req.query[item] as unknown) = null
-      } else if (typeof Number(req.query[item]) === 'number') {
-        ;(req.query[item] as unknown) = Number(req.query[item])
+      const value = req.query[item]
+      if (typeof value === 'string') {
+        if (value === 'true') {
+          ;(req.query as Record<string, unknown>)[item] = true
+        } else if (value === 'false') {
+          ;(req.query as Record<string, unknown>)[item] = false
+        } else if (value === 'undefined') {
+          ;(req.query as Record<string, unknown>)[item] = undefined
+        } else if (value === 'null') {
+          ;(req.query as Record<string, unknown>)[item] = null
+        } else if (/^\d+$/.test(value) && !isNaN(parseInt(value))) {
+          // Only convert to number if it's a valid integer
+          ;(req.query as Record<string, unknown>)[item] = parseInt(value)
+        }
+        // If it's any other string (including date strings), leave it as is
       }
     }
   }
