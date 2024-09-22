@@ -5,7 +5,6 @@ import { ReqWithUser } from '~types/common'
 import httpStatus from '~utils/httpStatus'
 import { todoService } from './todo.service'
 import { formatDate } from '~utils/dateTimteUtils'
-import { CLOSING } from 'ws'
 
 const createTodo = catchAsync(async (req, res) => {
   const { body, user } = req as ReqWithUser
