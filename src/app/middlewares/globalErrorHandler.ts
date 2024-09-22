@@ -16,7 +16,7 @@ const globalErrorHandler: ErrorRequestHandler = (
   _next: NextFunction
 ) => {
   if (envVars.env === 'development')
-    console.log(`🐱‍🏍 globalErrorHandler ~~`, { error })
+    console.error(`🐱‍🏍 globalErrorHandler ~~`, { error })
   else errorlogger.error(`🐱‍🏍 globalErrorHandler ~~`, error)
 
   let statusCode = 500

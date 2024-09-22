@@ -4,6 +4,8 @@ import sendResponse from '~shared/sendResponse'
 import { ReqWithUser } from '~types/common'
 import httpStatus from '~utils/httpStatus'
 import { todoService } from './todo.service'
+import { formatDate } from '~utils/dateTimteUtils'
+import { CLOSING } from 'ws'
 
 const createTodo = catchAsync(async (req, res) => {
   const { body, user } = req as ReqWithUser
@@ -46,9 +48,29 @@ const updateTodo = catchAsync(async (req, res) => {
   } = req as ReqWithUser
   const updatedTodo = await todoService.updateTodo(Number(id), body, user)
 
+  let successMessage = ''
+
+  console.log(
+    body.date && body.date !== formatDate(new Date()),
+    body.date,
+    formatDate(new Date())
+  )
+  console.log(body?.order && body?.order !== updatedTodo.order)
+  console.log(body?.is_complete, updatedTodo.is_complete)
+
+  if (body.date && body.date === formatDate(new Date()))
+    successMessage = 'Todo forwarded to today!'
+  else if (body?.order && body?.order === updatedTodo.order)
+    successMessage = 'Todo rearranged successfully!'
+  else if (body?.is_complete && updatedTodo.is_complete)
+    successMessage = 'Todo marked as completed!'
+  else if (!body?.is_complete && !updatedTodo.is_complete)
+    successMessage = 'Todo marked as incompleted!'
+  else successMessage = 'Todo updated successfully!'
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: 'Todo updated successfully!',
+    message: successMessage,
     data: updatedTodo
   })
 })
