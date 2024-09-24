@@ -14,7 +14,7 @@ export function buildImageGenPrompt(params: ImageGenParams): string {
     movement,
     style_intensity,
     prompt
-  } = params
+  } = params || {}
 
   let finalPrompt = prompt || ''
 
@@ -31,11 +31,11 @@ export function buildImageGenPrompt(params: ImageGenParams): string {
   if (style_intensity)
     finalPrompt += ` with a ${style_intensity} influence on the style`
 
-  return finalPrompt
+  return finalPrompt.trim()
 }
 
 export const getImageSize = (aspect: 'square' | 'portrait' | 'landscape') => {
   if (aspect === 'square') return '1024x1024'
-  if (aspect === 'portrait') return '1792x1024'
-  if (aspect === 'landscape') return '1024x1792'
+  if (aspect === 'portrait') return '1024x1792'
+  if (aspect === 'landscape') return '1792x1024'
 }
