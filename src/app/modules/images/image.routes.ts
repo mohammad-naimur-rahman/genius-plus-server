@@ -7,13 +7,29 @@ import { imageValidation } from './image.validation'
 
 const router = Router()
 
+router.use(authGuard(ENUM_USER_ROLE.USER))
+
 router
   .route('/')
-  .get(authGuard(ENUM_USER_ROLE.USER), imageController.getUserImages)
+  .get(imageController.getUserImages)
   .post(
-    authGuard(ENUM_USER_ROLE.USER),
     validateRequest(imageValidation.generateImageZSchema),
     imageController.generateImage
+  )
+
+router
+  .route('/:id')
+  .get(
+    validateRequest(imageValidation.getOrDeleteImageZSchema),
+    imageController.getImage
+  )
+  .patch(
+    validateRequest(imageValidation.updateImageZSchema),
+    imageController.updateImage
+  )
+  .delete(
+    validateRequest(imageValidation.getOrDeleteImageZSchema),
+    imageController.deleteImage
   )
 
 export const imageRoutes = router

@@ -11,7 +11,7 @@ import {
   setQuerySortingNPagination
 } from '~utils/paginationUtils'
 import { ImageCreateBody } from './image.interface'
-import image from './image.schema'
+import image, { Image } from './image.schema'
 import { buildImageGenPrompt, getImageSize } from './image.utils'
 
 cloudinary.config({
@@ -93,7 +93,53 @@ const getUserImages = async (params: PaginateParams, reqUser: JwtPayload) => {
   return { userImages, meta: { page, limit, total } }
 }
 
+const getImage = async (id: number, reqUser: JwtPayload) => {
+  const singleImage = await db.query.image.findFirst({
+    where: and(eq(image.id, id), eq(image.user_id, reqUser.userId))
+  })
+
+  if (!singleImage) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Image not found')
+  }
+
+  return singleImage
+}
+
+const updateImage = async (
+  id: number,
+  data: Partial<Image>,
+  reqUser: JwtPayload
+) => {
+  const updatedImage = await db
+    .update(image)
+    .set(data)
+    .where(and(eq(image.id, id), eq(image.user_id, reqUser.userId)))
+    .returning()
+
+  if (!updatedImage[0]) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Image not found or update failed')
+  }
+
+  return updatedImage[0]
+}
+
+const deleteImage = async (id: number, reqUser: JwtPayload) => {
+  const deletedImage = await db
+    .delete(image)
+    .where(and(eq(image.id, id), eq(image.user_id, reqUser.userId)))
+    .returning()
+
+  if (!deletedImage[0]) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Image not found or delete failed')
+  }
+
+  return null
+}
+
 export const imagesService = {
   generateImage,
-  getUserImages
+  getUserImages,
+  getImage,
+  updateImage,
+  deleteImage
 }

@@ -29,7 +29,53 @@ const getUserImages = catchAsync(async (req, res) => {
   })
 })
 
+const getImage = catchAsync(async (req, res) => {
+  const {
+    params: { id },
+    user
+  } = req as ReqWithUser
+  const imageData = await imagesService.getImage(Number(id), user)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Image retrieved successfully!',
+    data: imageData
+  })
+})
+
+const updateImage = catchAsync(async (req, res) => {
+  const {
+    params: { id },
+    body,
+    user
+  } = req as ReqWithUser
+  const updatedImage = await imagesService.updateImage(Number(id), body, user)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Image updated successfully!',
+    data: updatedImage
+  })
+})
+
+const deleteImage = catchAsync(async (req, res) => {
+  const {
+    params: { id },
+    user
+  } = req as ReqWithUser
+  await imagesService.deleteImage(Number(id), user)
+
+  sendResponse(res, {
+    statusCode: httpStatus.NO_CONTENT,
+    message: 'Image deleted successfully!',
+    data: null
+  })
+})
+
 export const imageController = {
   generateImage,
-  getUserImages
+  getUserImages,
+  getImage,
+  updateImage,
+  deleteImage
 }
