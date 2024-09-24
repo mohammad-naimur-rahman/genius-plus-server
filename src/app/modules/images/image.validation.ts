@@ -20,8 +20,7 @@ const generateImageZSchema = z.object({
         subject_type: z.string().optional(),
         environment: z.string().optional(),
         movement: z.string().optional(),
-        style_intensity: z.string().optional(),
-        prompt: z.string().optional()
+        style_intensity: z.string().optional()
       })
       .optional(),
     style: z.enum(['natural', 'vivid'])

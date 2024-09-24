@@ -5,3 +5,8 @@ export {
   default as user,
   userRoleEnum
 } from '~app/modules/users/user.schema'
+
+export {
+  default as image,
+  imageAspectEnum
+} from '~app/modules/images/image.schema'

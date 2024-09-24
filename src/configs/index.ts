@@ -34,7 +34,10 @@ const envSchema = z.object({
   SMTP_PASSWORD: z.string(),
   SMTP_HOST: z.string(),
   VERIFICATION_LINK_EXPIRES_IN: z.string(),
-  OPENAI_API_KEY: z.string()
+  OPENAI_API_KEY: z.string(),
+  CLOUDINARY_CLOUD_NAME: z.string(),
+  CLOUDINARY_API_KEY: z.string(),
+  CLOUDINARY_API_SECRET: z.string()
 })
 
 const envServer = envSchema.safeParse({ ...process.env })
@@ -78,7 +81,12 @@ const envVars = {
     smtpHost: envServer.data.SMTP_HOST,
     verificationLinkExpiresIn: envServer.data.VERIFICATION_LINK_EXPIRES_IN
   },
-  openaiApiKey: envServer.data.OPENAI_API_KEY
+  openaiApiKey: envServer.data.OPENAI_API_KEY,
+  cloudinary: {
+    cloudName: envServer.data.CLOUDINARY_CLOUD_NAME,
+    apiKey: envServer.data.CLOUDINARY_API_KEY,
+    apiSecret: envServer.data.CLOUDINARY_API_SECRET
+  }
 }
 
 export default envVars

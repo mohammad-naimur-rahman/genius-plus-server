@@ -10,7 +10,6 @@ export interface ImageGenParams {
   environment?: string
   movement?: string
   style_intensity?: string
-  prompt?: string
 }
 
 export interface ImageCreateBody {

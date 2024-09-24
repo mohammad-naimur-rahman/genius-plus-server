@@ -1,9 +1,24 @@
+import { v2 as cloudinary } from 'cloudinary'
 import { JwtPayload } from 'jsonwebtoken'
+import { db } from '~db'
+import ApiError from '~utils/errorHandlers/ApiError'
+import httpStatus from '~utils/httpStatus'
 import { openai } from '~utils/openai'
 import { ImageCreateBody } from './image.interface'
+import image, { NewImage } from './image.schema'
 import { buildImageGenPrompt, getImageSize } from './image.utils'
 
-const generateImage = async (body: ImageCreateBody, reqUser: JwtPayload) => {
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+})
+
+const generateImage = async (
+  body: ImageCreateBody,
+  reqUser: JwtPayload
+): Promise<NewImage> => {
   const { prompt, aspect, full_control, promptParams, style, title } = {
     ...body
   }
@@ -25,18 +40,37 @@ const generateImage = async (body: ImageCreateBody, reqUser: JwtPayload) => {
     response_format: 'url'
   })
 
-  console.log(generatedImage.data[0].url)
-
-  return {
-    id: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    user_id: reqUser.userId,
-    title,
-    prompt,
-    url: generatedImage.data[0].url,
-    aspect
+  if (!generatedImage.data[0].url) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Image generation failed'
+    )
   }
+
+  const cloudinaryResponse = await cloudinary.uploader.upload(
+    generatedImage.data[0].url,
+    {
+      folder: 'generated_images',
+      access_mode: 'public'
+    }
+  )
+
+  if (!cloudinaryResponse.secure_url) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Image upload failed')
+  }
+
+  const insertedImage = await db
+    .insert(image)
+    .values({
+      user_id: reqUser.userId,
+      title,
+      prompt,
+      url: cloudinaryResponse.secure_url,
+      aspect
+    })
+    .returning()
+
+  return insertedImage[0]
 }
 
 export const imagesService = {

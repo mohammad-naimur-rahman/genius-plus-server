@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { ImageGenParams } from './image.interface'
 
 export function buildImageGenPrompt(params: ImageGenParams): string {
@@ -12,11 +13,10 @@ export function buildImageGenPrompt(params: ImageGenParams): string {
     subject_type,
     environment,
     movement,
-    style_intensity,
-    prompt
+    style_intensity
   } = params || {}
 
-  let finalPrompt = prompt || ''
+  let finalPrompt = ''
 
   if (style) finalPrompt += ` in a ${style} style`
   if (color_scheme) finalPrompt += ` with ${color_scheme} colors`
@@ -38,4 +38,9 @@ export const getImageSize = (aspect: 'square' | 'portrait' | 'landscape') => {
   if (aspect === 'square') return '1024x1024'
   if (aspect === 'portrait') return '1024x1792'
   if (aspect === 'landscape') return '1792x1024'
+}
+
+export const downloadImageFromURL = async (url: string) => {
+  const response = await axios.get(url, { responseType: 'stream' })
+  return response.data
 }
