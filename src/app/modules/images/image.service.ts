@@ -1,11 +1,13 @@
 import { v2 as cloudinary } from 'cloudinary'
+import { and, AnyColumn, eq, ilike, SQLWrapper } from 'drizzle-orm'
 import { JwtPayload } from 'jsonwebtoken'
 import { db } from '~db'
 import ApiError from '~utils/errorHandlers/ApiError'
 import httpStatus from '~utils/httpStatus'
 import { openai } from '~utils/openai'
+import { getOffset, getSortOrder } from '~utils/paginationUtils'
 import { ImageCreateBody } from './image.interface'
-import image, { NewImage } from './image.schema'
+import image from './image.schema'
 import { buildImageGenPrompt, getImageSize } from './image.utils'
 
 cloudinary.config({
@@ -15,10 +17,7 @@ cloudinary.config({
   secure: true
 })
 
-const generateImage = async (
-  body: ImageCreateBody,
-  reqUser: JwtPayload
-): Promise<NewImage> => {
+const generateImage = async (body: ImageCreateBody, reqUser: JwtPayload) => {
   const { prompt, aspect, full_control, promptParams, style, title } = {
     ...body
   }
@@ -73,6 +72,47 @@ const generateImage = async (
   return insertedImage[0]
 }
 
+type SortOrder = 'asc' | 'desc'
+
+export interface PaginateParams {
+  sortBy: AnyColumn
+  sortOrder: SortOrder
+  page: number
+  limit: number
+  search?: string
+}
+
+const getUserImages = async (params: PaginateParams, reqUser: JwtPayload) => {
+  const { sortBy, sortOrder, page, limit, search } = params
+  console.log(params)
+
+  const query: any = {
+    where: and(
+      ilike(image.title, `%${search || ''}%`),
+      eq(image.user_id, reqUser.userId)
+    ),
+    limit: limit || 10,
+    offset: getOffset(page, limit)
+  }
+
+  if (sortBy && (sortBy as unknown as 'string | number | symbol') in image) {
+    const sortKey = image[
+      sortBy as unknown as keyof typeof image
+    ] as unknown as AnyColumn | SQLWrapper
+
+    query.orderBy = [getSortOrder(sortOrder || 'desc')(sortKey)]
+  }
+
+  const userImages = await db.query.image.findMany(query)
+
+  if (!userImages) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No images found for this user')
+  }
+
+  return userImages
+}
+
 export const imagesService = {
-  generateImage
+  generateImage,
+  getUserImages
 }

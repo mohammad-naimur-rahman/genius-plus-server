@@ -9,6 +9,7 @@ const router = Router()
 
 router
   .route('/')
+  .get(authGuard(ENUM_USER_ROLE.USER), imageController.getUserImages)
   .post(
     authGuard(ENUM_USER_ROLE.USER),
     validateRequest(imageValidation.generateImageZSchema),

@@ -20,6 +20,9 @@ export const processQuery = (
         } else if (/^\d+$/.test(value) && !isNaN(parseInt(value))) {
           // Only convert to number if it's a valid integer
           ;(req.query as Record<string, unknown>)[item] = parseInt(value)
+        } else if (!isNaN(Number(value))) {
+          // Convert to number if it's a valid number
+          ;(req.query as Record<string, unknown>)[item] = Number(value)
         }
         // If it's any other string (including date strings), leave it as is
       }

@@ -1,10 +1,9 @@
-import { Request, Response } from 'express'
 import catchAsync from '~shared/catchAsync'
 import sendResponse from '~shared/sendResponse'
 import { ReqWithUser } from '~types/common'
+import { formatDate } from '~utils/dateTimteUtils'
 import httpStatus from '~utils/httpStatus'
 import { todoService } from './todo.service'
-import { formatDate } from '~utils/dateTimteUtils'
 
 const createTodo = catchAsync(async (req, res) => {
   const { body, user } = req as ReqWithUser
@@ -74,7 +73,7 @@ const updateTodo = catchAsync(async (req, res) => {
   })
 })
 
-const deleteTodo = catchAsync(async (req: Request, res: Response) => {
+const deleteTodo = catchAsync(async (req, res) => {
   const {
     params: { id },
     user
@@ -83,7 +82,7 @@ const deleteTodo = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.NO_CONTENT).send()
 })
 
-const deleteTodoForTheDay = catchAsync(async (req: Request, res: Response) => {
+const deleteTodoForTheDay = catchAsync(async (req, res) => {
   const { user, query } = req as ReqWithUser
   await todoService.deleteTodoForTheDay(query, user)
   res.status(httpStatus.NO_CONTENT).send()
