@@ -1,14 +1,16 @@
 import { Response } from 'express'
 
+export type IMetadata = {
+  page: number
+  limit: number
+  total: number
+}
+
 type IApiReponse<T> = {
   statusCode: number
   success?: boolean
   message?: string | null
-  meta?: {
-    page: number
-    limit: number
-    total: number
-  }
+  meta?: IMetadata
   tokens?: {
     accessToken: string
     refreshToken: string
