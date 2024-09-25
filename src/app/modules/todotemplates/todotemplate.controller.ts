@@ -2,6 +2,7 @@ import catchAsync from '~shared/catchAsync'
 import sendResponse from '~shared/sendResponse'
 import { ReqWithUser } from '~types/common'
 import httpStatus from '~utils/httpStatus'
+import { filterQueries } from '~utils/paginationUtils'
 import { todoTemplateService } from './todotemplate.service'
 
 const createTodoTemplate = catchAsync(async (req, res) => {
@@ -16,13 +17,18 @@ const createTodoTemplate = catchAsync(async (req, res) => {
 })
 
 const getAllTodoTemplates = catchAsync(async (req, res) => {
-  const { user } = req as ReqWithUser
-  const todoTemplates = await todoTemplateService.getAllTodoTemplates(user)
+  const { query, user } = req as ReqWithUser
+  const params = filterQueries(query)
+  const { todoTemplates, meta } = await todoTemplateService.getAllTodoTemplates(
+    params,
+    user
+  )
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Todo templates retrieved successfully!',
-    data: todoTemplates
+    data: todoTemplates,
+    meta
   })
 })
 

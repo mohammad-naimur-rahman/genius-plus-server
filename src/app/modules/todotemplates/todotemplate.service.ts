@@ -1,6 +1,11 @@
-import { and, eq } from 'drizzle-orm'
+import { and, eq, ilike } from 'drizzle-orm'
 import { JwtPayload } from 'jsonwebtoken'
 import { db } from '~db'
+import { DBQuery, PaginateParams } from '~types/common'
+import {
+  getTotalCount,
+  setQuerySortingNPagination
+} from '~utils/paginationUtils'
 import todoTemplate, { NewTodoTemplate } from './todotemplate.schema'
 
 const createTodoTemplate = async (
@@ -18,12 +23,22 @@ const createTodoTemplate = async (
   return newTemplate[0]
 }
 
-const getAllTodoTemplates = async (reqUser: JwtPayload) => {
-  const todoTemplates = await db
-    .select()
-    .from(todoTemplate)
-    .where(eq(todoTemplate.user_id, reqUser.userId))
-  return todoTemplates
+const getAllTodoTemplates = async (
+  params: PaginateParams,
+  reqUser: JwtPayload
+) => {
+  const { page, limit, search } = params
+
+  const findQuery = and(
+    ilike(todoTemplate.title, `%${search || ''}%`),
+    eq(todoTemplate.user_id, reqUser.userId)
+  )
+  const query: DBQuery = { where: findQuery }
+  setQuerySortingNPagination(query, params, todoTemplate)
+
+  const todoTemplates = await db.query.todoTemplate.findMany(query)
+  const total = await getTotalCount(todoTemplate, findQuery)
+  return { todoTemplates, meta: { page, limit, total } }
 }
 
 const updateTodoTemplate = async (
