@@ -9,7 +9,6 @@ export function buildImageGenPrompt(params: ImageGenParams): string {
     mood,
     background_type,
     texture,
-    subject_type,
     environment,
     movement,
     style_intensity
@@ -24,7 +23,6 @@ export function buildImageGenPrompt(params: ImageGenParams): string {
   if (mood) finalPrompt += ` creating a ${mood} mood`
   if (background_type) finalPrompt += ` with a ${background_type} background`
   if (texture) finalPrompt += ` having a ${texture} texture`
-  if (subject_type) finalPrompt += ` featuring a ${subject_type}`
   if (environment) finalPrompt += ` set in a ${environment}`
   if (movement) finalPrompt += ` showing ${movement}`
   if (style_intensity)

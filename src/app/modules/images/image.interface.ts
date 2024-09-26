@@ -6,7 +6,6 @@ export interface ImageGenParams {
   mood?: string
   background_type?: string
   texture?: string
-  subject_type?: string
   environment?: string
   movement?: string
   style_intensity?: string

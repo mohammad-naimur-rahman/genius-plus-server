@@ -24,7 +24,6 @@ const generateImageZSchema = z.object({
         mood: z.string().optional(),
         background_type: z.string().optional(),
         texture: z.string().optional(),
-        subject_type: z.string().optional(),
         environment: z.string().optional(),
         movement: z.string().optional(),
         style_intensity: z.string().optional()
@@ -53,7 +52,6 @@ const updateImageZSchema = z.object({
         mood: z.string().optional(),
         background_type: z.string().optional(),
         texture: z.string().optional(),
-        subject_type: z.string().optional(),
         environment: z.string().optional(),
         movement: z.string().optional(),
         style_intensity: z.string().optional()
