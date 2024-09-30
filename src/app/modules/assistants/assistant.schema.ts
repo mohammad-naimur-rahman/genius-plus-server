@@ -5,8 +5,8 @@ import { tableIdandTimestamp } from '~utils/dbUtils'
 
 export const assistantTypeEnum = pgEnum('assistant_type', [
   'talkingBuddy',
-  'OpenAI',
-  'Custom'
+  'tutor',
+  'general'
 ])
 
 const assistant = createTable('assistants', {
