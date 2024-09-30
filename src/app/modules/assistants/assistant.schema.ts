@@ -24,7 +24,8 @@ const assistant = createTable('assistants', {
   temperature: integer('temperature').notNull().default(0.5),
   top_p: integer('top_p').notNull().default(1),
   frequency_penalty: integer('frequency_penalty').notNull().default(0),
-  max_tokens: integer('max_tokens').notNull()
+  presence_penalty: integer('presence_penalty').notNull().default(0),
+  max_completion_tokens: integer('max_completion_tokens').notNull()
 })
 
 export default assistant
