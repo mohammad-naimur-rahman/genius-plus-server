@@ -19,8 +19,14 @@ router
 
 router
   .route('/run/:id')
-  .post(talkingBuddyController.runAThread)
-  .get(talkingBuddyController.getThreadMessages)
+  .post(
+    validateRequest(talkingBuddyValidation.getOrDeleteThreadZValidation),
+    talkingBuddyController.runAThread
+  )
+  .get(
+    validateRequest(talkingBuddyValidation.getOrDeleteThreadZValidation),
+    talkingBuddyController.getThreadMessages
+  )
 
 router
   .route('/:id')

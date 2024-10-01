@@ -17,8 +17,8 @@ const updateThreadZValidation = z.object({
 
 const getOrDeleteThreadZValidation = z.object({
   ...headerToken,
-  query: z.object({
-    id: z.number()
+  params: z.object({
+    id: z.string().refine(v => Number(v))
   })
 })
 
