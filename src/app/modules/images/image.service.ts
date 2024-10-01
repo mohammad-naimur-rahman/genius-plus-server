@@ -5,7 +5,7 @@ import { db } from '~db'
 import { DBQuery, PaginateParams } from '~types/common'
 import ApiError from '~utils/errorHandlers/ApiError'
 import httpStatus from '~utils/httpStatus'
-import { openai } from '~utils/openai'
+import { openai } from '~utils/openaiUtils'
 import {
   getTotalCount,
   setQuerySortingNPagination

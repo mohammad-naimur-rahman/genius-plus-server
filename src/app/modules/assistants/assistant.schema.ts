@@ -1,4 +1,4 @@
-import { integer, pgEnum, text, varchar } from 'drizzle-orm/pg-core'
+import { integer, numeric, pgEnum, text, varchar } from 'drizzle-orm/pg-core'
 import { user } from '~db/schema'
 import { createTable } from '~db/utils'
 import { tableIdandTimestamp } from '~utils/dbUtils'
@@ -6,7 +6,8 @@ import { tableIdandTimestamp } from '~utils/dbUtils'
 export const assistantTypeEnum = pgEnum('assistant_type', [
   'talkingBuddy',
   'tutor',
-  'general'
+  'general',
+  'notes'
 ])
 
 const assistant = createTable('assistants', {
@@ -21,11 +22,10 @@ const assistant = createTable('assistants', {
   model: varchar('model', { length: 255 }).notNull().default('gpt-4o'),
   assistant_id: varchar('assistant_id', { length: 255 }).notNull(),
   vector_store_id: varchar('vector_store_id', { length: 255 }),
-  temperature: integer('temperature').notNull().default(0.5),
-  top_p: integer('top_p').notNull().default(1),
-  frequency_penalty: integer('frequency_penalty').notNull().default(0),
-  presence_penalty: integer('presence_penalty').notNull().default(0),
-  max_completion_tokens: integer('max_completion_tokens').notNull()
+  temperature: numeric('temperature', { precision: 2, scale: 1 }).default(
+    '0.5'
+  ),
+  top_p: numeric('top_p', { precision: 2, scale: 1 }).default('1')
 })
 
 export default assistant

@@ -6,7 +6,7 @@ import { formatDate } from '~utils/dateTimteUtils'
 import ApiError from '~utils/errorHandlers/ApiError'
 import httpStatus from '~utils/httpStatus'
 import { isValidJSON } from '~utils/isValidSomething'
-import { openai } from '~utils/openai'
+import { openai } from '~utils/openaiUtils'
 import todo, { NewTodo } from './todo.schema'
 
 const createTodo = async (body: NewTodo, reqUser: JwtPayload) => {
