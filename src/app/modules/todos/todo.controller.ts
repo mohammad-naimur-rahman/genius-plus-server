@@ -2,6 +2,7 @@ import catchAsync from '~shared/catchAsync'
 import sendResponse from '~shared/sendResponse'
 import { ReqWithUser } from '~types/common'
 import { formatDate } from '~utils/dateTimteUtils'
+import ApiError from '~utils/errorHandlers/ApiError'
 import httpStatus from '~utils/httpStatus'
 import { todoService } from './todo.service'
 
@@ -46,15 +47,11 @@ const updateTodo = catchAsync(async (req, res) => {
   } = req as ReqWithUser
   const updatedTodo = await todoService.updateTodo(Number(id), body, user)
 
-  let successMessage = ''
+  if (!updatedTodo) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Todo not found with this id!')
+  }
 
-  console.log(
-    body.date && body.date !== formatDate(new Date()),
-    body.date,
-    formatDate(new Date())
-  )
-  console.log(body?.order && body?.order !== updatedTodo.order)
-  console.log(body?.is_complete, updatedTodo.is_complete)
+  let successMessage = ''
 
   if (body.date && body.date === formatDate(new Date()))
     successMessage = 'Todo forwarded to today!'
@@ -85,6 +82,7 @@ const deleteTodo = catchAsync(async (req, res) => {
 const deleteTodoForTheDay = catchAsync(async (req, res) => {
   const { user, query } = req as ReqWithUser
   await todoService.deleteTodoForTheDay(query, user)
+
   res.status(httpStatus.NO_CONTENT).send()
 })
 

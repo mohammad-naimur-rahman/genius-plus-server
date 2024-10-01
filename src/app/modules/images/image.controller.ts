@@ -65,11 +65,7 @@ const deleteImage = catchAsync(async (req, res) => {
   } = req as ReqWithUser
   await imagesService.deleteImage(Number(id), user)
 
-  sendResponse(res, {
-    statusCode: httpStatus.NO_CONTENT,
-    message: 'Image deleted successfully!',
-    data: null
-  })
+  res.status(httpStatus.NO_CONTENT).send()
 })
 
 export const imageController = {

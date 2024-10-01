@@ -58,11 +58,7 @@ const deleteTodoTemplate = catchAsync(async (req, res) => {
   } = req as ReqWithUser
   await todoTemplateService.deleteTodoTemplate(Number(id), user)
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    message: 'Todo template deleted successfully!',
-    data: null
-  })
+  res.status(httpStatus.NO_CONTENT).send()
 })
 
 export const todoTemplateController = {

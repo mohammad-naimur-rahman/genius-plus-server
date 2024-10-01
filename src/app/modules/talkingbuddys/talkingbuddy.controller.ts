@@ -66,11 +66,7 @@ const deleteThread = catchAsync(async (req, res) => {
   } = req as ReqWithUser
   await talkingBuddyService.deleteThread(Number(id), user)
 
-  sendResponse(res, {
-    statusCode: httpStatus.NO_CONTENT,
-    message: 'Thread deleted successfully!',
-    data: null
-  })
+  res.status(httpStatus.NO_CONTENT).send()
 })
 
 // Thread run controller
