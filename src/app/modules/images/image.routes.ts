@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import authGuard from '~app/middlewares/authGuard'
+import removeId from '~app/middlewares/removeId'
 import validateRequest from '~app/middlewares/validateRequest'
 import { ENUM_USER_ROLE } from '~enums/user'
 import { imageController } from './image.controller'
@@ -24,6 +25,7 @@ router
     imageController.getImage
   )
   .patch(
+    removeId,
     validateRequest(imageValidation.updateImageZSchema),
     imageController.updateImage
   )

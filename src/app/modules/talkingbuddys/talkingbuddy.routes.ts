@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import authGuard from '~app/middlewares/authGuard'
+import removeId from '~app/middlewares/removeId'
 import validateRequest from '~app/middlewares/validateRequest'
 import { ENUM_USER_ROLE } from '~enums/user'
 import { talkingBuddyController } from './talkingbuddy.controller'
@@ -35,6 +36,7 @@ router
     talkingBuddyController.getThread
   )
   .patch(
+    removeId,
     validateRequest(talkingBuddyValidation.updateThreadZValidation),
     talkingBuddyController.updateThread
   )

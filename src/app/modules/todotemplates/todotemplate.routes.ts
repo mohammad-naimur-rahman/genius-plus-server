@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import authGuard from '~app/middlewares/authGuard'
+import removeId from '~app/middlewares/removeId'
 import validateRequest from '~app/middlewares/validateRequest'
 import { ENUM_USER_ROLE } from '~enums/user'
 import { todoTemplateController } from './todotemplate.controller'
@@ -20,6 +21,7 @@ router
 router
   .route('/:id')
   .patch(
+    removeId,
     validateRequest(todoTemplateValidation.updateTodoTemplateZSchema),
     todoTemplateController.updateTodoTemplate
   )
