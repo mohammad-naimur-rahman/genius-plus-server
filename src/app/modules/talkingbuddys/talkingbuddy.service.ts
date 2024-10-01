@@ -8,6 +8,7 @@ import ApiError from '~utils/errorHandlers/ApiError'
 import httpStatus from '~utils/httpStatus'
 import { openai } from '~utils/openaiUtils'
 import { NewAssistant } from '../assistants/assistant.schema'
+import { Thread } from '../threads/thread.schema'
 import { CreateTalkingBuddyBody } from './talkingbuddy.interface'
 
 const createThread = async (
@@ -89,6 +90,64 @@ const createThread = async (
   return newThread[0]
 }
 
+const getAllThreads = async (reqUser: JwtPayload) => {
+  const takingBuddyAssistant = await db.query.assistant.findFirst({
+    where: and(
+      eq(assistant.user_id, reqUser.userId),
+      eq(assistant.type, 'talkingBuddy')
+    ),
+    columns: { id: true }
+  })
+
+  if (!takingBuddyAssistant) {
+    return []
+  }
+
+  const threads = await db.query.thread.findMany({
+    where: and(
+      eq(thread.user_id, reqUser.userId),
+      eq(thread.assistant_id, takingBuddyAssistant.id)
+    )
+  })
+  return threads
+}
+
+const getThread = async (id: number, reqUser: JwtPayload) => {
+  const singleThread = await db.query.thread.findFirst({
+    where: and(eq(thread.id, id), eq(thread.user_id, reqUser.userId))
+  })
+
+  if (!singleThread) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Thread not found with this id!')
+  }
+
+  return singleThread
+}
+
+const updateThread = async (
+  id: number,
+  body: Partial<Thread>,
+  reqUser: JwtPayload
+) => {
+  const updatedThread = await db
+    .update(thread)
+    .set(body)
+    .where(and(eq(thread.id, id), eq(thread.user_id, reqUser.userId)))
+    .returning()
+  return updatedThread[0]
+}
+
+const deleteThread = async (id: number, reqUser: JwtPayload) => {
+  await db
+    .delete(thread)
+    .where(and(eq(thread.id, id), eq(thread.user_id, reqUser.userId)))
+  return null
+}
+
 export const talkingBuddyService = {
-  createThread
+  createThread,
+  getAllThreads,
+  getThread,
+  updateThread,
+  deleteThread
 }

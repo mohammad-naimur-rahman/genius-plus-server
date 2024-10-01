@@ -8,6 +8,22 @@ const createThreadZValidation = z.object({
   })
 })
 
+const updateThreadZValidation = z.object({
+  ...headerToken,
+  body: z.object({
+    name: z.string().optional()
+  })
+})
+
+const getOrDeleteThreadZValidation = z.object({
+  ...headerToken,
+  query: z.object({
+    id: z.number()
+  })
+})
+
 export const talkingBuddyValidation = {
-  createThreadZValidation
+  createThreadZValidation,
+  updateThreadZValidation,
+  getOrDeleteThreadZValidation
 }
