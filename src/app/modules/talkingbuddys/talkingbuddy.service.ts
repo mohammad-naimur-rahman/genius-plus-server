@@ -144,10 +144,87 @@ const deleteThread = async (id: number, reqUser: JwtPayload) => {
   return null
 }
 
+// Thread run service
+const runAThread = async (
+  id: number,
+  body: { prompt: string },
+  reqUser: JwtPayload
+) => {
+  const talkingBuddyThread = await db.query.thread.findFirst({
+    where: and(eq(thread.id, id), eq(thread.user_id, reqUser.userId)),
+    columns: { thread_id: true, assistant_id: true }
+  })
+
+  if (!talkingBuddyThread) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Thread not found with this id!')
+  }
+
+  const talkingBuddyAssistant = await db.query.assistant.findFirst({
+    where: and(
+      eq(assistant.id, talkingBuddyThread.assistant_id),
+      eq(assistant.type, 'talkingBuddy')
+    ),
+    columns: { assistant_id: true, max_completion_tokens: true }
+  })
+
+  if (!talkingBuddyAssistant) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'Assistant not found with this id!'
+    )
+  }
+
+  await openai.beta.threads.messages.create(talkingBuddyThread.thread_id, {
+    role: 'user',
+    content: body.prompt
+  })
+
+  const data = await openai.beta.threads.runs.create(
+    talkingBuddyThread.thread_id,
+    {
+      assistant_id: talkingBuddyAssistant?.assistant_id,
+      stream: false,
+      max_completion_tokens: talkingBuddyAssistant.max_completion_tokens || 500
+    }
+  )
+
+  return data
+}
+
+const getThreadMessages = async (id: number, reqUser: JwtPayload) => {
+  const talkingBuddyThread = await db.query.thread.findFirst({
+    where: and(eq(thread.id, id), eq(thread.user_id, reqUser.userId)),
+    columns: { thread_id: true }
+  })
+
+  if (!talkingBuddyThread) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Thread not found with this id!')
+  }
+
+  const messages = await openai.beta.threads.messages.list(
+    talkingBuddyThread.thread_id
+  )
+
+  const sortedMessages = messages.data.sort(
+    (a, b) => a.created_at - b.created_at
+  )
+
+  const messagesContents = sortedMessages.map(message => ({
+    id: message.id,
+    role: message.role,
+    content:
+      message.content[0].type === 'text' ? message.content[0].text.value : ''
+  }))
+
+  return messagesContents
+}
+
 export const talkingBuddyService = {
   createThread,
   getAllThreads,
   getThread,
   updateThread,
-  deleteThread
+  deleteThread,
+  runAThread,
+  getThreadMessages
 }

@@ -18,6 +18,11 @@ router
   )
 
 router
+  .route('/run/:id')
+  .post(talkingBuddyController.runAThread)
+  .get(talkingBuddyController.getThreadMessages)
+
+router
   .route('/:id')
   .get(
     validateRequest(talkingBuddyValidation.getOrDeleteThreadZValidation),

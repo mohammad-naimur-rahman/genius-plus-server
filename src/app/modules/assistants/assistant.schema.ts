@@ -25,7 +25,8 @@ const assistant = createTable('assistants', {
   temperature: numeric('temperature', { precision: 2, scale: 1 }).default(
     '0.5'
   ),
-  top_p: numeric('top_p', { precision: 2, scale: 1 }).default('1')
+  top_p: numeric('top_p', { precision: 2, scale: 1 }).default('1'),
+  max_completion_tokens: integer('max_completion_tokens').default(500)
 })
 
 export default assistant

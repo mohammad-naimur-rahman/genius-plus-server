@@ -73,10 +73,43 @@ const deleteThread = catchAsync(async (req, res) => {
   })
 })
 
+// Thread run controller
+const runAThread = catchAsync(async (req, res) => {
+  const {
+    body,
+    params: { id },
+    user
+  } = req as ReqWithUser
+  const run = await talkingBuddyService.runAThread(Number(id), body, user)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Thread run successfully!',
+    data: run
+  })
+})
+
+// Thread messages controller
+const getThreadMessages = catchAsync(async (req, res) => {
+  const {
+    params: { id },
+    user
+  } = req as ReqWithUser
+  const messages = await talkingBuddyService.getThreadMessages(Number(id), user)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Thread messages fetched successfully!',
+    data: messages
+  })
+})
+
 export const talkingBuddyController = {
   createThread,
   getAllThreads,
   getThread,
   updateThread,
-  deleteThread
+  deleteThread,
+  runAThread,
+  getThreadMessages
 }
