@@ -3,6 +3,7 @@ import catchAsync from '~shared/catchAsync'
 import sendResponse from '~shared/sendResponse'
 import { ReqWithUser } from '~types/common'
 import httpStatus from '~utils/httpStatus'
+import { RunTalkingBuddyThreadQuery } from './talkingbuddy.interface'
 import { talkingBuddyService } from './talkingbuddy.service'
 
 const createThread = catchAsync(async (req, res) => {
@@ -73,8 +74,8 @@ const deleteThread = catchAsync(async (req, res) => {
 // Thread run controller
 const runAThread = catchAsync(async (req, res) => {
   const {
-    body,
     params: { id },
+    query,
     user
   } = req as ReqWithUser
 
@@ -99,7 +100,12 @@ const runAThread = catchAsync(async (req, res) => {
     eventEmitter.removeAllListeners('event')
   })
 
-  await talkingBuddyService.runAThread(Number(id), body, user, eventEmitter)
+  await talkingBuddyService.runAThread(
+    Number(id),
+    query as unknown as RunTalkingBuddyThreadQuery,
+    user,
+    eventEmitter
+  )
 })
 
 // Thread messages controller

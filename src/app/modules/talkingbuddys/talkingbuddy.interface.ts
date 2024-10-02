@@ -2,6 +2,6 @@ export interface CreateTalkingBuddyBody {
   name: string
 }
 
-export interface RunTalkingBuddyThreadBody {
+export interface RunTalkingBuddyThreadQuery {
   prompt: string
 }

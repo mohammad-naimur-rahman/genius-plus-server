@@ -13,7 +13,7 @@ import { NewAssistant } from '../assistants/assistant.schema'
 import { Thread } from '../threads/thread.schema'
 import {
   CreateTalkingBuddyBody,
-  RunTalkingBuddyThreadBody
+  RunTalkingBuddyThreadQuery
 } from './talkingbuddy.interface'
 
 const createThread = async (
@@ -152,7 +152,7 @@ const deleteThread = async (id: number, reqUser: JwtPayload) => {
 // Thread run service
 const runAThread = async (
   id: number,
-  body: RunTalkingBuddyThreadBody,
+  query: RunTalkingBuddyThreadQuery,
   reqUser: JwtPayload,
   eventEmitter: EventEmitter
 ) => {
@@ -183,7 +183,7 @@ const runAThread = async (
   // First create a message
   await openai.beta.threads.messages.create(talkingBuddyThread.thread_id, {
     role: 'user',
-    content: body.prompt
+    content: query.prompt
   })
 
   // Then create a run

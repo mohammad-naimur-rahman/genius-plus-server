@@ -18,16 +18,17 @@ router
     talkingBuddyController.createThread
   )
 
-router
-  .route('/run/:id')
-  .post(
-    validateRequest(talkingBuddyValidation.getOrDeleteThreadZValidation),
-    talkingBuddyController.runAThread
-  )
-  .get(
-    validateRequest(talkingBuddyValidation.getOrDeleteThreadZValidation),
-    talkingBuddyController.getThreadMessages
-  )
+router.get(
+  '/run/:id',
+  validateRequest(talkingBuddyValidation.getOrDeleteThreadZValidation),
+  talkingBuddyController.runAThread
+)
+
+router.get(
+  '/messages/:id',
+  validateRequest(talkingBuddyValidation.getOrDeleteThreadZValidation),
+  talkingBuddyController.getThreadMessages
+)
 
 router
   .route('/:id')
