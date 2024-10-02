@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import catchAsync from '~shared/catchAsync'
 import sendResponse from '~shared/sendResponse'
 import { ReqWithUser } from '~types/common'
@@ -76,13 +77,29 @@ const runAThread = catchAsync(async (req, res) => {
     params: { id },
     user
   } = req as ReqWithUser
-  const run = await talkingBuddyService.runAThread(Number(id), body, user)
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    message: 'Thread run successfully!',
-    data: run
+  res.sseSetup()
+  const eventEmitter = new EventEmitter()
+  let streamClosed = false
+
+  eventEmitter.on('event', data => {
+    if (streamClosed) {
+      return
+    }
+
+    if (data.event === 'thread.message.delta') {
+      res.sseSend(data.data.delta.content[0].text.value)
+    } else if (data.event === 'thread.run.completed') {
+      res.sseStop()
+      streamClosed = true
+    }
   })
+  req.on('close', () => {
+    streamClosed = true
+    eventEmitter.removeAllListeners('event')
+  })
+
+  await talkingBuddyService.runAThread(Number(id), body, user, eventEmitter)
 })
 
 // Thread messages controller

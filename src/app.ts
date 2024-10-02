@@ -4,6 +4,7 @@ import express, { Application, NextFunction, Request, Response } from 'express'
 import globalErrorHandler from '~app/middlewares/globalErrorHandler'
 import { processQuery } from '~app/middlewares/processQuery'
 import requestLogger from '~app/middlewares/requestLogger'
+import sse from '~app/middlewares/sse'
 import router from '~app/routes'
 import envVars from '~configs'
 import httpStatus from '~utils/httpStatus'
@@ -16,6 +17,9 @@ app.use(cookieParser())
 app.use(processQuery)
 app.use(requestLogger)
 
+// Setting streaming for OpenAI
+app.use(sse)
+
 // Parser
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -26,7 +30,7 @@ app.use('/api/v1', router)
 //Global error handler
 app.use(globalErrorHandler)
 
-//Handle not found
+//Handle not found routes
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(httpStatus.NOT_FOUND).json({
     success: false,

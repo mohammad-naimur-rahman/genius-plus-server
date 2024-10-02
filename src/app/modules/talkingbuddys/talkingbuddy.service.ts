@@ -1,4 +1,6 @@
 import { and, eq } from 'drizzle-orm'
+
+import { EventEmitter } from 'events'
 import { JwtPayload } from 'jsonwebtoken'
 import { AssistantCreateParams } from 'openai/resources/beta/assistants.mjs'
 import { openaiPrompts } from '~constants/openaiPrompts'
@@ -151,7 +153,8 @@ const deleteThread = async (id: number, reqUser: JwtPayload) => {
 const runAThread = async (
   id: number,
   body: RunTalkingBuddyThreadBody,
-  reqUser: JwtPayload
+  reqUser: JwtPayload,
+  eventEmitter: EventEmitter
 ) => {
   const talkingBuddyThread = await db.query.thread.findFirst({
     where: and(eq(thread.id, id), eq(thread.user_id, reqUser.userId)),
@@ -188,10 +191,14 @@ const runAThread = async (
     talkingBuddyThread.thread_id,
     {
       assistant_id: talkingBuddyAssistant?.assistant_id,
-      stream: false,
+      stream: true,
       max_completion_tokens: talkingBuddyAssistant.max_completion_tokens || 500
     }
   )
+
+  for await (const event of data) {
+    eventEmitter.emit('event', event)
+  }
 
   return data
 }
