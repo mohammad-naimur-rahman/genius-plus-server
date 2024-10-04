@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 
 import { EventEmitter } from 'events'
 import { JwtPayload } from 'jsonwebtoken'
@@ -112,7 +112,9 @@ const getAllThreads = async (reqUser: JwtPayload) => {
     where: and(
       eq(thread.user_id, reqUser.userId),
       eq(thread.assistant_id, takingBuddyAssistant.id)
-    )
+    ),
+    limit: 20,
+    orderBy: [desc(thread.createdAt)]
   })
   return threads
 }
