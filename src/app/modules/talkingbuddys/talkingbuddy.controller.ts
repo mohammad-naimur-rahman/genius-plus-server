@@ -31,7 +31,7 @@ const getAllThreads = catchAsync(async (req, res) => {
 const getThread = catchAsync(async (req, res) => {
   const {
     user,
-    query: { id }
+    params: { id }
   } = req as ReqWithUser
   const thread = await talkingBuddyService.getThread(Number(id), user)
 
@@ -45,7 +45,7 @@ const getThread = catchAsync(async (req, res) => {
 const updateThread = catchAsync(async (req, res) => {
   const {
     body,
-    query: { id },
+    params: { id },
     user
   } = req as ReqWithUser
   const updatedThread = await talkingBuddyService.updateThread(
@@ -64,7 +64,7 @@ const updateThread = catchAsync(async (req, res) => {
 const deleteThread = catchAsync(async (req, res) => {
   const {
     user,
-    query: { id }
+    params: { id }
   } = req as ReqWithUser
   await talkingBuddyService.deleteThread(Number(id), user)
 
