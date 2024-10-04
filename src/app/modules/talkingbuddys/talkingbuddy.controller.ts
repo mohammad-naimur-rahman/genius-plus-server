@@ -3,7 +3,7 @@ import catchAsync from '~shared/catchAsync'
 import sendResponse from '~shared/sendResponse'
 import { ReqWithUser } from '~types/common'
 import httpStatus from '~utils/httpStatus'
-import { RunTalkingBuddyThreadQuery } from './talkingbuddy.interface'
+import applySSE from '~utils/sseUtils'
 import { talkingBuddyService } from './talkingbuddy.service'
 
 const createThread = catchAsync(async (req, res) => {
@@ -75,37 +75,15 @@ const deleteThread = catchAsync(async (req, res) => {
 const runAThread = catchAsync(async (req, res) => {
   const {
     params: { id },
-    query,
+    body,
     user
   } = req as ReqWithUser
 
-  res.sseSetup()
+  // Setup for streaming response
   const eventEmitter = new EventEmitter()
-  let streamClosed = false
+  applySSE(req, res, eventEmitter)
 
-  eventEmitter.on('event', data => {
-    if (streamClosed) {
-      return
-    }
-
-    if (data.event === 'thread.message.delta') {
-      res.sseSend(data.data.delta.content[0].text.value)
-    } else if (data.event === 'thread.run.completed') {
-      res.sseStop()
-      streamClosed = true
-    }
-  })
-  req.on('close', () => {
-    streamClosed = true
-    eventEmitter.removeAllListeners('event')
-  })
-
-  await talkingBuddyService.runAThread(
-    Number(id),
-    query as unknown as RunTalkingBuddyThreadQuery,
-    user,
-    eventEmitter
-  )
+  await talkingBuddyService.runAThread(Number(id), body, user, eventEmitter)
 })
 
 // Thread messages controller

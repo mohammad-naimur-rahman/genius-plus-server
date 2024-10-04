@@ -18,7 +18,7 @@ router
     talkingBuddyController.createThread
   )
 
-router.get(
+router.post(
   '/run/:id',
   validateRequest(talkingBuddyValidation.getOrDeleteThreadZValidation),
   talkingBuddyController.runAThread

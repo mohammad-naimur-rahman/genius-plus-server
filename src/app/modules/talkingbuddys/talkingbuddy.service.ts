@@ -152,7 +152,7 @@ const deleteThread = async (id: number, reqUser: JwtPayload) => {
 // Thread run service
 const runAThread = async (
   id: number,
-  query: RunTalkingBuddyThreadQuery,
+  body: RunTalkingBuddyThreadQuery,
   reqUser: JwtPayload,
   eventEmitter: EventEmitter
 ) => {
@@ -183,7 +183,7 @@ const runAThread = async (
   // First create a message
   await openai.beta.threads.messages.create(talkingBuddyThread.thread_id, {
     role: 'user',
-    content: query.prompt
+    content: body.prompt
   })
 
   // Then create a run
@@ -199,8 +199,6 @@ const runAThread = async (
   for await (const event of data) {
     eventEmitter.emit('event', event)
   }
-
-  return data
 }
 
 const getThreadMessages = async (id: number, reqUser: JwtPayload) => {
