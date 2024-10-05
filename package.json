@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "bun --hot src/server.ts",
     "start": "bun src/server.ts",
-    "build": "bun src/server.ts",
+    "build": "bun i",
     "lint": "eslint --ignore-path .eslintignore --ext .js,.ts .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --ignore-path .gitignore --write 'src/**/*.{js,ts,json}'",
