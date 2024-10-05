@@ -63,6 +63,8 @@ const createTodoWithAI = async (
 
   const todoJSON = completion.choices[0].message.content
 
+  console.log(todoJSON)
+
   const isValid = todoJSON && isValidJSON(todoJSON)
 
   if (!isValid) {
