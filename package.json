@@ -11,7 +11,7 @@
     "prettier": "prettier --ignore-path .gitignore --write 'src/**/*.{js,ts,json}'",
     "prettier:fix": "prettier --write .",
     "lint-prettier": "bun lint && bun prettier",
-    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production') { require('child_process').execSync('husky install', { stdio: 'inherit' }) }\"",
+    "prepare": "husky install",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
