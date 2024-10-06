@@ -15,6 +15,7 @@ RUN cd /temp/dev && bun install --frozen-lockfile
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
 COPY package.json bun.lockb /temp/prod/
+ENV CI=true
 RUN cd /temp/prod && bun install --frozen-lockfile --production
 
 # copy node_modules from temp folder
@@ -37,4 +38,4 @@ COPY --from=prerelease /usr/src/app/package.json .
 # run the app
 USER bun
 EXPOSE 3000/tcp
-CMD ["bun", "run", "dev"]
+CMD ["bun", "run", "start"]
