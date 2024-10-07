@@ -2,7 +2,7 @@ FROM oven/bun AS build
 
 WORKDIR /app
 # Copy all project files
-COPY .env .env
+# COPY .env .env
 COPY package.json .
 COPY . .
 # Install dependencies
