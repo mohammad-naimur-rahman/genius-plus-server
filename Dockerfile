@@ -24,4 +24,4 @@ EXPOSE 5000
 CMD ["bun", "run", "start"]
 
 # build command -> docker build -t naimurrahmandev/genius-plus-server:v1 .
-# run command -> naimurrahmandev/genius-plus-server:v1
+# run command -> docker run --name genius-plus-server -d -p 5000:5000 -t naimurrahmandev/genius-plus-server:v1

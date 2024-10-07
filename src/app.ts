@@ -7,12 +7,32 @@ import requestLogger from '~app/middlewares/requestLogger'
 import sse from '~app/middlewares/sse'
 import router from '~app/routes'
 import envVars from '~configs'
+import ApiError from '~utils/errorHandlers/ApiError'
 import httpStatus from '~utils/httpStatus'
 
 const app: Application = express()
 
 // Middlewares
-app.use(cors({ origin: envVars.clientUrl.split('/en')[0], credentials: true }))
+const allowedOrigins = [
+  envVars.clientUrl.split('/en')[0], // First origin
+  'http://localhost:3000' // Second origin
+]
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(
+          new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Not allowed by CORS')
+        )
+      }
+    },
+    credentials: true
+  })
+)
+
 app.use(cookieParser())
 app.use(processQuery)
 app.use(requestLogger)
