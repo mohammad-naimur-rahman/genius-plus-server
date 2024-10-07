@@ -1,40 +1,27 @@
-# Dockerfile
+FROM oven/bun AS build
 
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1 as base
-WORKDIR /usr/src/app
-
-# install dependencies into temp folder
-# this will cache them and speed up future builds
-FROM base AS install
-RUN mkdir -p /temp/dev
-COPY package.json bun.lockb /temp/dev/
-RUN cd /temp/dev && bun install --frozen-lockfile
-
-# install with --production (exclude devDependencies)
-RUN mkdir -p /temp/prod
-COPY package.json bun.lockb /temp/prod/
-ENV CI=true
-RUN cd /temp/prod && bun install --frozen-lockfile --production --ignore-scripts
-
-# copy node_modules from temp folder
-# then copy all (non-ignored) project files into the image
-FROM install AS prerelease
-COPY --from=install /temp/dev/node_modules node_modules
+WORKDIR /app
+# Copy all project files
+COPY .env .env
+COPY package.json .
 COPY . .
+# Install dependencies
+RUN bun install --frozen-lockfile --ignore-scripts
 
-# [optional] tests & build
-# ENV NODE_ENV=production
-# RUN bun test
-# RUN bun run build
+# --- Stage 2: Production ---
+FROM oven/bun AS production
 
-# copy production dependencies and source code into final image
-FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/src ./src
-COPY --from=prerelease /usr/src/app/package.json ./package.json
-# run the app
-USER bun
-EXPOSE 3000/tcp
+# Set working directory
+WORKDIR /app
+
+# Copy built files from the build stage
+COPY --from=build /app /app
+
+# Expose port 3000 for the Next.js app
+EXPOSE 5000
+
+# Start the bun app
 CMD ["bun", "run", "start"]
+
+# build command -> docker build -t naimurrahmandev/genius-plus-server:v1 .
+# run command -> naimurrahmandev/genius-plus-server:v1
